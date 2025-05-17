@@ -1,38 +1,85 @@
 {
   "expo": {
-    "name": "GetOut-App",
-    "slug": "GetOut-App",
+    "name": "ThePulse",
+    "slug": "ThePulse",
+    "scheme": "ThePulse",
     "version": "1.0.0",
-
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-
-    "experiments": {
-      "tsconfigPaths": true
-    },
-
-    "plugins": [],
-
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-
+    "icon": "./assets/images/adaptive-icon.png",
     "userInterfaceStyle": "light",
-
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "extra": {
+      "googleMapsApiKey": "AIzaSyDgFfaNeiXq7Q83cQ7umoOiT44zwL_6ALw",
+      "googleClientId": "394007137559-cm20hr440kfiu43flfpv740eekjris9j.apps.googleusercontent.com",
+      "supabaseUrl": "https://jiyifcajwwakzoorzfdx.supabase.co",
+      "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppeWlmY2Fqd3dha3pvb3J6ZmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzIyODMsImV4cCI6MjA2Mjc0ODI4M30.3uvD9KJ5cZUtdpVl4njMA2hcbRIUK2tNKj3lwGFUzPA",
+      "GeminiApiKey": "AIzaSyD_PWbKkhgp0y3kLHsY9q9Li0XOs2Nt0bA"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to take photos",
+        "NSMicrophoneUsageDescription": "This app needs microphone access to record videos",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show it on the map",
+        "NSLocationAlwaysUsageDescription": "This app needs access to your location to show it on the map"
+      },
+      "usesAppleSignIn": true,
+      "bundleIdentifier": "com.narayant.thepulse"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
-    }
+      },
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "package": "com.narayant.thepulse"
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.394007137559-cm20hr440kfiu43flfpv740eekjris9j"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      "expo-web-browser"
+    ]
   }
 }
