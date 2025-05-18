@@ -8,20 +8,7 @@ import * as MediaLibrary from 'expo-media-library';
 import { getLocationString } from '@/hooks/getLocationString';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { UUIDhash } from '@/utils/hash';
-type PostType = 'text' | 'poll' | 'response';
-
-interface PostUploaderProps {
-  postPhoto: string | null;
-  postType: PostType;
-  caption: string;
-  pollOptions?: string[];
-  location: [number, number] | null;
-  visibilityDistance: number | null;
-  userMetadata: any;
-  setUserMetadata: (metadata: any) => void;
-  onError: (message: string) => void;
-  postAnonymous: boolean
-}
+import { PostUploaderProps } from '@/types/type';
 
 const PostUploader = ({
   postPhoto,

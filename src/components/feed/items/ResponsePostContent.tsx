@@ -4,14 +4,7 @@ import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/utils/supabase";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { UUIDhash } from "@/utils/hash";
-
-interface ResponsePostContentProps {
-  caption: string;
-  user_id: string;
-  postId: string;
-  inputRefs: React.RefObject<Record<string, TextInput | null>>;
-  onFocus: (rowId: string) => void;
-}
+import { ResponsePostContentProps } from "@/types/type";
 
 const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: ResponsePostContentProps) => {
   const { userMetadata, isAnonymous } = useSession();
@@ -29,7 +22,8 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
         .insert({
           post_id: postId,
           user_id: userMetadata?.id,
-          response: response.trim()
+          response: response.trim(),
+          anonymous: isAnonymous
         });
 
       if (error) throw error;

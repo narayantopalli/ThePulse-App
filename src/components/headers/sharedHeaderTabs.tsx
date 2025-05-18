@@ -5,12 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { getLocationString } from "@/hooks/getLocationString";
 import { useEffect, useState } from "react";
 import { useSession } from "@/contexts/SessionContext";
-
-interface SharedHeaderTabsProps {
-  title?: string;
-  whichIcon?: number;
-  showLocation?: boolean;
-}
+import { SharedHeaderTabsProps } from "@/types/type";
 
 const SharedHeaderTabs = ({ title, whichIcon, showLocation }: SharedHeaderTabsProps) => {
   const { location, isAnonymous } = useSession();

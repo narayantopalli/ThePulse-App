@@ -1,13 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Switch } from 'react-native';
 import Slider from '@react-native-community/slider';
-
-interface VisibilitySelectorProps {
-  sliderValue: number;
-  onSliderValueChange: (value: number) => void;
-  postAnonymous: boolean;
-  setPostAnonymous: (anonymous: boolean) => void;
-}
+import { VisibilitySelectorProps } from '@/types/type';
 
 const VisibilitySelector = ({ 
   sliderValue, 

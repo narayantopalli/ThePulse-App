@@ -27,4 +27,4 @@ const AddPostButton = () => {
   );
 };
 
-export default AddPostButton; 
+export default AddPostButton;

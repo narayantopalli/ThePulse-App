@@ -1,175 +1,279 @@
-import { createUserWithEmailAndPassword } from "@firebase/auth";
-import { ImageSourcePropType, TextInputProps, TouchableOpacityProps } from "react-native";
-
-declare interface Driver {
-  id: number;
-  first_name: string;
-  last_name: string;
-  profile_image_url: string;
-  car_image_url: string;
-  car_seats: number;
-  rating: number;
+// User Types
+export interface User {
+  id: string;
+  firstname: string;
+  lastname: string;
+  birthday: string;
+  gender: string;
+  bio: string;
+  avatar_url: string;
+  last_posted: string;
 }
 
-declare interface MarkerData {
-  latitude: number;
-  longitude: number;
-  id: number;
-  title: string;
-  profile_image_url: string;
-  car_image_url: string;
-  car_seats: number;
-  rating: number;
-  first_name: string;
-  last_name: string;
-  time?: number;
-  price?: string;
+export interface UserMetadata {
+  id: string;
+  firstname: string;
+  lastname: string;
+  birthday: string;
+  gender: string;
+  bio: string;
+  avatar_url: string;
+  last_posted: string;
 }
 
-declare interface MapProps {
-  destinationLatitude?: number;
-  destinationLongitude?: number;
-  onDriverTimesCalculated?: (driversWithTimes: MarkerData[]) => void;
-  selectedDriver?: number | null;
-  onMapReady?: () => void;
-}
+// Post Types
+export type PostType = 'text' | 'poll' | 'response';
 
-declare interface Ride {
-  origin_address: string;
-  destination_address: string;
-  origin_latitude: number;
-  origin_longitude: number;
-  destination_latitude: number;
-  destination_longitude: number;
-  ride_time: number;
-  fare_price: number;
-  payment_status: string;
-  driver_id: number;
+interface Post {
+  id: string;
   user_id: string;
   created_at: string;
-  driver: {
-    first_name: string;
-    last_name: string;
-    car_seats: number;
+  data: {
+    type: "text" | "poll" | "response";
+    image_url?: string;
+    post_data: {
+      caption: string;
+      options?: string[];
+    };
+  };
+  user_data: {
+    username: string;
+    avatar_url?: string;
+  };
+  likes: number;
+  comments: number;
+  liked: boolean;
+  anonymous: boolean;
+  location_string: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface FeedPost {
+  id: string;
+  data: {
+    type: PostType;
+    [key: string]: any;
   };
 }
 
-declare interface ButtonProps extends TouchableOpacityProps {
+// Component Props Types
+export interface ButtonProps {
+  onPress: () => void;
   title: string;
-  bgVariant?: "primary" | "secondary" | "danger" | "outline" | "success";
-  textVariant?: "primary" | "default" | "secondary" | "danger" | "success";
-  IconLeft?: React.ComponentType<any>;
-  IconRight?: React.ComponentType<any>;
+  bgVariant?: 'primary' | 'secondary' | 'danger' | 'success' | 'outline';
+  textVariant?: 'primary' | 'secondary' | 'danger' | 'success';
   className?: string;
+  disabled?: boolean;
 }
 
-declare interface GoogleInputProps {
-  icon?: string;
-  initialLocation?: string;
-  containerStyle?: string;
-  textInputBackgroundColor?: string;
-  handlePress: ({
-    latitude,
-    longitude,
-    address,
-  }: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  }) => void;
-}
-
-declare interface InputFieldProps extends TextInputProps {
-  label: string;
-  icon?: any;
+export interface InputFieldProps {
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
   secureTextEntry?: boolean;
-  labelStyle?: string;
-  containerStyle?: string;
-  inputStyle?: string;
-  iconStyle?: string;
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   className?: string;
 }
 
-declare interface PaymentProps {
-  fullName: string;
-  email: string;
-  amount: string;
-  driverId: number;
-  rideTime: number;
-}
-
-declare interface LocationStore {
-  userLatitude: number | null;
-  userLongitude: number | null;
-  userAddress: string | null;
-  destinationLatitude: number | null;
-  destinationLongitude: number | null;
-  destinationAddress: string | null;
-  setUserLocation: ({
-    latitude,
-    longitude,
-    address,
-  }: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  }) => void;
-  setDestinationLocation: ({
-    latitude,
-    longitude,
-    address,
-  }: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  }) => void;
-}
-
-declare interface DriverStore {
-  drivers: MarkerData[];
-  selectedDriver: number | null;
-  setSelectedDriver: (driverId: number) => void;
-  setDrivers: (drivers: MarkerData[]) => void;
-  clearSelectedDriver: () => void;
-}
-
-declare interface DriverCardProps {
-  item: MarkerData;
-  selected: number;
-  setSelected: () => void;
-}
-
-interface UpdateSchema {
-  user: User;
-  updates: { displayName: string; photoURL: string; };
-}
-
-interface GetUserResponse {
+export interface ErrorMessageProps {
   message: string;
 }
 
-type User = {
-  uid: string;
+export interface StatusProps {
+  user_id: string;
+}
 
-  email: string | null;
-  displayName: string | null;
-  photoURL: string | null;
-  phoneNumber: string | null;
-  emailVerified: boolean;
-  isAnonymous: boolean;
-  tenantId: string | null;
+// Post Component Props
+export interface PostUploaderProps {
+  postPhoto: string | null;
+  postType: PostType;
+  caption: string;
+  pollOptions?: string[];
+  location: [number, number] | null;
+  visibilityDistance: number | null;
+  userMetadata: any;
+  setUserMetadata: (metadata: any) => void;
+  onError: (message: string) => void;
+  postAnonymous: boolean;
+}
 
-  providerData: Array<{
-    providerId: string;
-    uid: string;
-    displayName: string | null;
-    email: string | null;
-    phoneNumber: string | null;
-    photoURL: string | null;
-  }>;
+export interface TextPostProps {
+  text: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  maxLength?: number;
+}
 
-  metadata: {
-    creationTime?: string;
-    lastSignInTime?: string;
+export interface PollPostProps {
+  question: string;
+  options: string[];
+  onQuestionChange: (text: string) => void;
+  onOptionsChange: (options: string[]) => void;
+}
+
+export interface ResponsePostProps {
+  prompt: string;
+  onPromptChange: (text: string) => void;
+  placeholder?: string;
+}
+
+export interface PhotoPostProps {
+  imageUri: string;
+  onRemove?: () => void;
+}
+
+export interface VisibilitySelectorProps {
+  sliderValue: number;
+  onSliderValueChange: (value: number) => void;
+  postAnonymous: boolean;
+  setPostAnonymous: (anonymous: boolean) => void;
+}
+
+// Feed Component Props
+interface FeedItemProps {
+  onFocus: (rowId: string) => void;
+  inputRefs: React.RefObject<Record<string, TextInput | null>>;
+  post: {
+    id: string;
+    user_id: string;
+    created_at: string;
+    data: {
+      type: 'text' | 'poll' | 'response';
+      image_url?: string;
+      post_data: {
+        caption: string;
+        options?: string[];
+      };
+    };
+    user_data: any;
+    visibility_radius?: number | null;
+    location_string: string;
+    latitude: number;
+    longitude: number;
+    anonymous: boolean;
   };
+}
+
+export interface TextPostContentProps {
+  postId: string;
+  user_id: string;
+  caption: string;
+}
+
+export interface PollPostContentProps {
+  postId: string;
+  user_id: string;
+  caption: string;
+  options: string[];
+}
+
+export interface ResponsePostContentProps {
+  caption: string;
+  user_id: string;
+  postId: string;
+  inputRefs: React.RefObject<Record<string, TextInput | null>>;
+  onFocus: (rowId: string) => void;
+}
+
+// Map Component Props
+export interface Hotspot {
+  latitude: number;
+  longitude: number;
+  strength: number;
+}
+
+export interface CustomMapViewProps {
+  region: Region | null;
+  location: LocationObject | null;
+}
+
+export interface HotspotMarkersProps {
+  hotspots: Hotspot[];
+}
+
+export interface ResetLocationButtonProps {
+  onPress: () => void;
+}
+
+// Profile Component Props
+export interface ProfileHeaderProps {
+  onPhotoPress?: () => void;
+  isOwnProfile?: boolean;
+  profilePhotoURL?: string;
+  friendButton?: React.ReactNode;
+  userMetadata?: UserMetadata | null;
+}
+
+export interface ProfileBioProps {
+  bio?: string;
+  isOwnProfile?: boolean;
+}
+
+// Notification Types
+export interface NotificationItemProps {
+  item: any;
+  onIgnore: (id: string) => void;
+  currentUserId: string;
+}
+
+// Poll Types
+export interface PollVote {
+  id: string;
+  option_index: number;
+  created_at: string;
+  anonymous: boolean;
+  user_data: {
+    firstname: string;
+    lastname: string;
+    avatar_url?: string;
+  } | null;
+}
+
+// Response Types
+export interface Responses {
+  id: string;
+  created_at: string;
+  post_id: string;
+  anonymous: boolean;
+  response: string;
+  user_data: UserData | null;
 };
+
+// Session Context Types
+interface SessionContextType {
+  userMetadata: UserMetadata | null;
+  setUserMetadata: any;
+  loading: boolean;
+  profilePhotoURL: string | null;      // file://… (local) or null
+  updateProfilePhoto: (res: ImagePickerSuccessResult) => Promise<void>;
+  location: [number, number] | null;
+  feed: any[];
+  isAnonymous: boolean;
+  setIsAnonymous: (value: boolean) => void;
+  session: any;
+}
+
+// Friendship Types
+export type FriendshipStatus = 0 | 1 | 2;
+
+// Camera Types
+export interface CameraProps {
+  type?: 'front' | 'back';
+  flashMode?: 'off' | 'on' | 'auto' | 'torch';
+  ratio?: string;
+  ref?: any;
+}
+
+// AI Component Props
+export interface AIButtonProps {
+  onPress: () => void;
+  disabled?: boolean;
+}
+
+// Header Component Props
+export interface SharedHeaderTabsProps {
+  title?: string;
+  whichIcon?: number;
+  showLocation?: boolean;
+}

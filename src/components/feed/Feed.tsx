@@ -3,31 +3,7 @@ import { useSession } from "@/contexts/SessionContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect, useRef } from "react";
 import FeedItem from "./FeedItem";
-
-interface Post {
-  id: string;
-  user_id: string;
-  created_at: string;
-  data: {
-    type: "text" | "poll" | "response";
-    image_url?: string;
-    post_data: {
-      caption: string;
-      options?: string[];
-    };
-  };
-  user_data: {
-    username: string;
-    avatar_url?: string;
-  };
-  likes: number;
-  comments: number;
-  liked: boolean;
-  anonymous: boolean;
-  location_string: string;
-  latitude: number;
-  longitude: number;
-}
+import { Post } from "@/types/type";
 
 const Feed = () => {
   const { userMetadata, location } = useSession();

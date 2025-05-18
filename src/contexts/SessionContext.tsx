@@ -16,33 +16,10 @@ import * as MediaLibrary from "expo-media-library";
 import { requestForegroundPermissionsAsync } from "expo-location";
 import { watchPositionAsync } from "expo-location";
 import { Accuracy } from "expo-location";
+import { SessionContextType, UserMetadata } from "@/types/type";
 
 const BUCKET           = "images";   // storage bucket
 const STORAGE_KEY      = "LOCAL_AVATAR_PATH";
-
-interface SessionContextType {
-  userMetadata: UserMetadata | null;
-  setUserMetadata: any;
-  loading: boolean;
-  profilePhotoURL: string | null;      // file://… (local) or null
-  updateProfilePhoto: (res: ImagePickerSuccessResult) => Promise<void>;
-  location: [number, number] | null;
-  feed: any[];
-  isAnonymous: boolean;
-  setIsAnonymous: (value: boolean) => void;
-  session: any;
-}
-
-export interface UserMetadata {
-  id: string;
-  firstname: string;
-  lastname: string;
-  birthday: string;
-  gender: string;
-  bio: string;
-  avatar_url: string;
-  last_posted: string;
-}
 
 const SessionContext = createContext<SessionContextType>({
   userMetadata: null,

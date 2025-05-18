@@ -1,4 +1,4 @@
-import { GOOGLE_CLIENT_ID, images } from "@/constants";
+import { images } from "@/constants";
 import { router } from "expo-router";
 import { Text, View, Image, Platform, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";

@@ -1,8 +1,5 @@
 import { View, Text } from "react-native";
-
-interface ErrorMessageProps {
-  message: string;
-}
+import { ErrorMessageProps } from "@/types/type";
 
 const ErrorMessage = ({ message }: ErrorMessageProps) => {
   if (!message) return null;

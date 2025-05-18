@@ -1,11 +1,7 @@
 import { Text, View, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { useSession } from "@/contexts/SessionContext";
-
-interface ProfileBioProps {
-  bio?: string;
-  isOwnProfile?: boolean;
-}
+import { ProfileBioProps } from "@/types/type";
 
 const ProfileBio = ({ bio, isOwnProfile = false }: ProfileBioProps) => {
   const { userMetadata } = useSession();

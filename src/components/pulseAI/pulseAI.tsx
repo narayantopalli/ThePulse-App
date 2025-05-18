@@ -4,13 +4,7 @@ import AIButton from './AIButton';
 import { getChat } from '@/utils/getChat';
 import { useSession } from '@/contexts/SessionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Types
-interface FeedPost {
-  id: string;
-  // Add other feed post properties here
-}
-
+import { FeedPost } from '@/types/type';
 // Constants
 const ANIMATION_CONFIG = {
   SLIDE_OFFSET: -300,
@@ -162,9 +156,6 @@ const PulseAI = () => {
           alignItems: 'center',
           justifyContent: 'center',
         }}
-        accessible={true}
-        accessibilityRole="alert"
-        accessibilityLabel={isLoading ? "Analyzing feed" : "AI analysis complete"}
       >
         <View className="flex-row items-center ml-12">
             <Text 
@@ -177,7 +168,7 @@ const PulseAI = () => {
             >
                 {error ? error : 
                 isLoading || chatData.length === 0 ? 
-                `Analyzing the pulse${dots}` : 
+                `Measuring the pulse${dots}` : 
                 chatData}
             </Text>
         </View>

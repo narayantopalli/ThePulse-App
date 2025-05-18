@@ -1,11 +1,6 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
-
-interface ResponsePostProps {
-  prompt: string;
-  onPromptChange: (text: string) => void;
-  placeholder?: string;
-}
+import { ResponsePostProps } from '@/types/type';
 
 const ResponsePost = ({ 
   prompt, 

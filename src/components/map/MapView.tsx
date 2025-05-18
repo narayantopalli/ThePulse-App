@@ -1,21 +1,10 @@
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { useRef, useEffect, useState } from "react";
-import { LocationObject } from "expo-location";
 import ResetLocationButton from "@/components/map/ResetLocationButton";
 import HotspotMarkers from "./HotspotMarkers";
 import { useSession } from "@/contexts/SessionContext";
-
-interface Hotspot {
-  latitude: number;
-  longitude: number;
-  strength: number;
-}
-
-interface CustomMapViewProps {
-  region: Region | null;
-  location: LocationObject | null;
-}
+import { Hotspot, CustomMapViewProps } from "@/types/type";
 
 // Function to calculate distance between two points in meters
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {

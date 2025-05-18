@@ -1,13 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text } from 'react-native';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
-interface PollPostProps {
-  question: string;
-  options: string[];
-  onQuestionChange: (text: string) => void;
-  onOptionsChange: (options: string[]) => void;
-}
+import { PollPostProps } from '@/types/type';
 
 const PollPost = ({ question, options, onQuestionChange, onOptionsChange }: PollPostProps) => {
   const addOption = () => {

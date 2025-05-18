@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { router } from 'expo-router';
+import { NotificationItemProps } from '@/types/type';
 
 const formatTimeAgo = (date: Date) => {
   const now = new Date();
@@ -38,12 +39,6 @@ const formatTimeAgo = (date: Date) => {
   const diffInYears = Math.floor(diffInDays / 365);
   return `${diffInYears}y ago`;
 };
-
-interface NotificationItemProps {
-  item: any;
-  onIgnore: (id: string) => void;
-  currentUserId: string;
-}
 
 const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;

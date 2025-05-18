@@ -1,11 +1,7 @@
 import React from 'react';
 import { View, Image, TouchableOpacity } from 'react-native';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
-interface PhotoPostProps {
-  imageUri: string;
-  onRemove?: () => void;
-}
+import { PhotoPostProps } from '@/types/type';
 
 const PhotoPost = ({ imageUri, onRemove }: PhotoPostProps) => {
   return (

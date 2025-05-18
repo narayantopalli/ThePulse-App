@@ -1,9 +1,5 @@
 import { Text, View } from "react-native";
-
-interface TextPostContentProps {
-  caption: string;
-  user_id: string;
-}
+import { TextPostContentProps } from "@/types/type";
 
 const TextPostContent = ({ caption, user_id }: TextPostContentProps) => {
 

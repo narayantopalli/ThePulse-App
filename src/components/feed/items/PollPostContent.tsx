@@ -3,24 +3,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
 import { UUIDhash } from "@/utils/hash";
-
-interface PollVote {
-  option_index: number;
-  count: number;
-  user_vote?: number;
-}
-
-interface PollPostContentProps {
-  postId: string;
-  user_id: string;
-  caption: string;
-  options: string[];
-}
+import { PollPostContentProps } from "@/types/type";
 
 const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentProps) => {
   const { userMetadata, isAnonymous } = useSession();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [pollVotes, setPollVotes] = useState<PollVote[]>([]);
+  const [pollVotes, setPollVotes] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -55,7 +43,7 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
       if (userError && userError.code !== 'PGRST116') throw userError;
 
       // Initialize votes array with all options
-      const votes: PollVote[] = options.map((_, index) => ({
+      const votes: any[] = options.map((_, index) => ({
         option_index: index,
         count: voteCountsMap.get(index) || 0,
         user_vote: undefined
@@ -87,7 +75,8 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
         .upsert({
           post_id: postId,
           id: userMetadata?.id,
-          option_index: optionIndex
+          option_index: optionIndex,
+          anonymous: isAnonymous
         });
 
       if (error) throw error;

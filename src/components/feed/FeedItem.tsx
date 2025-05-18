@@ -5,30 +5,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import TextPostContent from "./items/TextPostContent";
 import PollPostContent from "./items/PollPostContent";
 import ResponsePostContent from "./items/ResponsePostContent";
-
-interface FeedItemProps {
-  onFocus: (rowId: string) => void;
-  inputRefs: React.RefObject<Record<string, TextInput | null>>;
-  post: {
-    id: string;
-    user_id: string;
-    created_at: string;
-    data: {
-      type: 'text' | 'poll' | 'response';
-      image_url?: string;
-      post_data: {
-        caption: string;
-        options?: string[];
-      };
-    };
-    user_data: any;
-    visibility_radius?: number | null;
-    location_string: string;
-    latitude: number;
-    longitude: number;
-    anonymous: boolean;
-  };
-}
+import { FeedItemProps } from "@/types/type";
 
 const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
   const { userMetadata } = useSession();

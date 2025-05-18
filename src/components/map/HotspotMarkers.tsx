@@ -1,16 +1,7 @@
 import React from 'react';
 import { View } from "react-native";
 import { Circle } from 'react-native-maps';
-
-interface Hotspot {
-  latitude: number;
-  longitude: number;
-  strength: number;
-}
-
-interface HotspotMarkersProps {
-  hotspots: Hotspot[];
-}
+import { HotspotMarkersProps } from "@/types/type";
 
 const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
 

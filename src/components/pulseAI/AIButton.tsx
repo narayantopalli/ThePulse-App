@@ -1,10 +1,6 @@
 import { TouchableOpacity, Image } from "react-native";
 import { icons } from "@/constants";
-
-interface AIButtonProps {
-  onPress?: () => void;
-}
-
+import { AIButtonProps } from "@/types/type";
 const AIButton = ({ onPress }: AIButtonProps) => {
   return (
     <TouchableOpacity

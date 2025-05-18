@@ -1,9 +1,11 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
+import PollInfo from "./PollInfo";
 
 const MyPostPollPostContent = ({ postId, user_id, caption, options }: { postId: string, user_id: string, caption: string, options: string[] }) => {
   const [pollVotes, setPollVotes] = useState<any[]>([]);
+  const [showPollInfo, setShowPollInfo] = useState(false);
 
   useEffect(() => {
     fetchPollVotes();
@@ -42,9 +44,12 @@ const MyPostPollPostContent = ({ postId, user_id, caption, options }: { postId: 
 
   return (
     <View className="bg-gray-50 rounded-2xl p-4">
-      <Text className="text-black text-lg font-JakartaSemiBold mb-4">
-        {caption}
-      </Text>
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className="text-black text-lg font-JakartaSemiBold">
+          {caption}
+        </Text>
+      </View>
+
       {options.map((option, index) => {
         const vote = pollVotes.find(v => v.option_index === index);
         const percentage = totalVotes > 0 ? (vote?.count || 0) / totalVotes * 100 : 0;
@@ -73,9 +78,27 @@ const MyPostPollPostContent = ({ postId, user_id, caption, options }: { postId: 
           </View>
         );
       })}
-      <Text className="text-gray-500 text-sm mt-2">
-        Total votes: {totalVotes}
-      </Text>
+
+      <View className="flex-row justify-between items-center">
+        <Text className="text-gray-500 text-sm mt-2">
+          Total votes: {totalVotes}
+        </Text>
+        <TouchableOpacity 
+            onPress={() => setShowPollInfo(true)}
+            className="bg-blue-500 px-4 py-2 rounded-lg mt-2"
+          >
+          <Text className="text-white font-JakartaMedium">Poll Results</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <PollInfo
+        showPollInfo={showPollInfo}
+        setShowPollInfo={setShowPollInfo}
+        caption={caption} 
+        totalVotes={totalVotes} 
+        options={options} 
+        pollVotes={pollVotes} 
+        postId={postId} />
     </View>
   );
 };

@@ -1,12 +1,6 @@
 import React from 'react';
 import { View, TextInput, Text } from 'react-native';
-
-interface TextPostProps {
-  text: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-  maxLength?: number;
-}
+import { TextPostProps } from '@/types/type';
 
 const TextPost = ({ 
   text, 

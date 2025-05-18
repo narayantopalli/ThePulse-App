@@ -5,10 +5,7 @@ import { useState } from "react";
 import { getLocalImageURI } from "@/utils/getImage";
 import { supabase } from "@/utils/supabase";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface StatusProps {
-  user_id: string;
-}
+import { StatusProps } from "@/types/type";
 
 const Status = ({ user_id }: StatusProps) => {
     const [status, setStatus] = useState<any>();

@@ -3,23 +3,7 @@ import ProfilePhoto from "@/components/profilePhoto";
 import { calculateAge } from "@/constants";
 import { router } from "expo-router";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
-interface UserMetadata {
-  firstname?: string;
-  lastname?: string;
-  birthday?: string;
-  gender?: string;
-  last_posted?: string;
-  avatar_url?: string;
-}
-
-interface ProfileHeaderProps {
-  onPhotoPress?: () => void;
-  isOwnProfile?: boolean;
-  profilePhotoURL?: string;
-  friendButton?: React.ReactNode;
-  userMetadata?: UserMetadata | null;
-}
+import { ProfileHeaderProps } from "@/types/type";
 
 const ProfileHeader = ({ 
   onPhotoPress, 

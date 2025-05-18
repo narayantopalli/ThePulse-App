@@ -1,9 +1,6 @@
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-
-interface ResetLocationButtonProps {
-  onPress: () => void;
-}
+import { ResetLocationButtonProps } from "@/types/type";
 
 const ResetLocationButton = ({ onPress }: ResetLocationButtonProps) => {
   return (
