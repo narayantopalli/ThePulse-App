@@ -34,6 +34,8 @@ const SessionContext = createContext<SessionContextType>({
   session: null,
   searchRadius: 5000,
   setSearchRadius: () => {},
+  blockedPosts: [],
+  setBlockedPosts: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -51,10 +53,18 @@ export const SessionProvider = ({ children }: Props) => {
   const [isAnonymous, setIsAnonymous]   = useState(false);
   const [session, setSession]           = useState<any>(null);
   const [searchRadius, setSearchRadius] = useState<number>(5000);
+  const [blockedPosts, setBlockedPosts] = useState<string[]>([]);
 
   useEffect(() => {
     AsyncStorage.getItem('searchRadius').then((radius) => {
       if (radius) setSearchRadius(parseInt(radius));
+    });
+    AsyncStorage.getItem('blockedPosts').then((posts) => {
+      if (posts) setBlockedPosts(JSON.parse(posts));
+    });
+    supabase.from('reports').select('post_id').eq('user_id', userMetadata?.id).then(({ data }) => {
+      if (data) setBlockedPosts(data.map((post) => post.post_id));
+      AsyncStorage.setItem('blockedPosts', JSON.stringify(blockedPosts));
     });
   }, []);
 
@@ -96,8 +106,11 @@ export const SessionProvider = ({ children }: Props) => {
         };
       }));
 
+      // remove blocked posts from feed
+      const feedWithoutBlockedPosts = feedWithUserData.filter((post) => !blockedPosts.includes(post.id));
+
       // Sort feed by created_at in descending order (newest first)
-      const sortedFeed = feedWithUserData
+      const sortedFeed = feedWithoutBlockedPosts
         .filter((post): post is NonNullable<typeof post> => post !== null)
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
@@ -113,9 +126,14 @@ export const SessionProvider = ({ children }: Props) => {
   const getFeedFromLocalStorage = async () => {
     if (userMetadata?.id) {
       const storedFeed = await AsyncStorage.getItem(`feed_${userMetadata.id}`);
-      if (storedFeed) setFeed(JSON.parse(storedFeed));
+      const filteredFeed = (JSON.parse(storedFeed || '[]') as any[]).filter((post) => !blockedPosts.includes(post.id));
+      setFeed(filteredFeed);
     }
   }
+
+  useEffect(() => {
+    getFeedFromLocalStorage();
+  }, [blockedPosts])
 
   useEffect(() => {
     let locationSubscription: Location.LocationSubscription;
@@ -282,7 +300,9 @@ export const SessionProvider = ({ children }: Props) => {
         setIsAnonymous,
         session,
         searchRadius,
-        setSearchRadius
+        setSearchRadius,
+        blockedPosts,
+        setBlockedPosts
       }}
     >
       {children}

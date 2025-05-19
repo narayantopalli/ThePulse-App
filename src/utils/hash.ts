@@ -1,14 +1,12 @@
+import { createHash } from 'crypto';
 
-// Simple hash function for anonymous IDs
+// SHA-256 hash function for anonymous IDs
 export const UUIDhash = (str: string | undefined): string => {
     if (!str) return '';
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
+    
+    // Create SHA-256 hash
+    const hash = createHash('sha256').update(str).digest('hex');
+    
     // Convert to UUID format
-    const hex = Math.abs(hash).toString(16).padStart(32, '0');
-    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+    return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-${hash.slice(12, 16)}-${hash.slice(16, 20)}-${hash.slice(20, 32)}`;
 };

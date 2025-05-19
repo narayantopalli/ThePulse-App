@@ -6,6 +6,7 @@ import TextPostContent from "./items/TextPostContent";
 import PollPostContent from "./items/PollPostContent";
 import ResponsePostContent from "./items/ResponsePostContent";
 import { FeedItemProps } from "@/types/type";
+import ReportButton from "../ReportButton";
 
 const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
   const { userMetadata } = useSession();
@@ -73,11 +74,12 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
           )}
         </TouchableOpacity>
         <View className="ml-3 flex-1">
-          <Text className="text-black font-JakartaSemiBold text-xl">
-            {post.user_id === userMetadata?.id 
-              ? `Me` 
-              : `${post.user_data.firstname || ''}`}
-          </Text>
+          <View className="flex-row justify-between items-center">
+            <Text className="text-black font-JakartaSemiBold text-xl">
+              {post.anonymous ? "Anonymous" : `${post.user_data.firstname || ''}`}
+            </Text>
+            <ReportButton postId={post.id} />
+          </View>
           <View className="flex-row items-center flex-wrap">
             <Text className="text-gray-500 text-sm">
               {new Date(post.created_at).toLocaleString('en-US', {

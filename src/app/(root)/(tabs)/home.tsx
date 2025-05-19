@@ -29,7 +29,7 @@ const Home = () => {
           thumbColor={isAnonymous ? '#f4f3f4' : '#f4f3f4'}
         />
       </View>
-      <VisibilityRadiusButton 
+      <VisibilityRadiusButton
         searchRadius={searchRadius}
         setSearchRadius={setSearchRadius}
       />

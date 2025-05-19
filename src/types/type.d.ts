@@ -254,6 +254,8 @@ interface SessionContextType {
   session: any;
   searchRadius: number;
   setSearchRadius: (value: number) => void;
+  blockedPosts: string[];
+  setBlockedPosts: (value: string[]) => void;
 }
 
 // Friendship Types

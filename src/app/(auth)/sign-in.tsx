@@ -193,6 +193,14 @@ const SignIn = () => {
                   placeholderTextColor="#9CA3AF"
                 />
               </View>
+              <TouchableOpacity 
+                onPress={() => router.push("/(auth)/forgot-password")}
+                className="mt-2"
+              >
+                <Text className="text-sm text-gray-600 font-JakartaMedium">
+                  Forgot Password?
+                </Text>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity
               className="w-full h-14 bg-black rounded-xl items-center justify-center shadow-sm mt-6 mb-4"
