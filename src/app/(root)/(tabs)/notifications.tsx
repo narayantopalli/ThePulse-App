@@ -15,7 +15,6 @@ const Notifications = () => {
   useEffect(() => {
     if (userMetadata?.id) {
       fetchNotifications();
-      console.log("notifications:", notifications);
     }
   }, [userMetadata?.id]);
 

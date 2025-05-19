@@ -17,7 +17,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
   const renderPostContent = () => {
     switch (post.data.type) {
       case 'text':
-        return <TextPostContent caption={post.data.post_data.caption} user_id={post.user_id} />;
+        return <TextPostContent caption={post.data.post_data.caption} user_id={post.user_id} postId={post.id} />;
       case 'poll':
         return (
           <PollPostContent
@@ -76,7 +76,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
           <Text className="text-black font-JakartaSemiBold text-xl">
             {post.user_id === userMetadata?.id 
               ? `Me` 
-              : `${post.user_data.first_name || ''} ${post.user_data.last_name || ''}`}
+              : `${post.user_data.firstname || ''}`}
           </Text>
           <View className="flex-row items-center flex-wrap">
             <Text className="text-gray-500 text-sm">

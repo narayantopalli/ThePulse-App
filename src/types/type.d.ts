@@ -178,8 +178,8 @@ export interface ResponsePostContentProps {
 
 // Map Component Props
 export interface Hotspot {
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   strength: number;
 }
 
@@ -252,6 +252,8 @@ interface SessionContextType {
   isAnonymous: boolean;
   setIsAnonymous: (value: boolean) => void;
   session: any;
+  searchRadius: number;
+  setSearchRadius: (value: number) => void;
 }
 
 // Friendship Types

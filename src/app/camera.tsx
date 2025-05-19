@@ -1,4 +1,4 @@
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, CameraType, useCameraPermissions, FlashMode } from 'expo-camera';
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import { useState, useRef } from 'react';
 import {Image, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
@@ -9,8 +9,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const Camera = () => {
-  const { path, returnPath } = useLocalSearchParams<{ path: string, returnPath: string, savePhoto: string }>();
+  const { path, returnPath, lockFront } = useLocalSearchParams<{ path: string, returnPath: string, savePhoto: string, lockFront: string }>();
   const [facing, setFacing] = useState<CameraType>('front');
+  const [flash, setFlash] = useState<FlashMode>('auto');
   const [permission, requestPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const [zoom, setZoom] = useState(0);
@@ -137,6 +138,7 @@ const Camera = () => {
           style={styles.camera} 
           facing={facing} 
           zoom={zoom}
+          flash={flash}
         />
       </View>
       <View className="absolute left-0 right-0 top-0 bottom-[85%] bg-black/50" />
@@ -180,12 +182,30 @@ const Camera = () => {
               <View className="flex-1 m-2 bg-white rounded-full" />
             </TouchableOpacity>
             
-            <TouchableOpacity 
-              className="absolute right-0 w-12 h-12 rounded-full bg-white/20 items-center justify-center border-2 border-white/30"
-              onPress={toggleCameraFacing}
-            >
-              <FontAwesome6 name="rotate" size={20} color="white" />
-            </TouchableOpacity>
+            <View className="absolute right-0 flex-row gap-4">
+              <TouchableOpacity 
+                className="w-12 h-12 rounded-full bg-white/20 items-center justify-center border-2 border-white/30"
+                onPress={() => setFlash((current: FlashMode) => {
+                  if (current === 'auto') return 'on';
+                  if (current === 'on') return 'off';
+                  return 'auto';
+                })}
+              >
+                <FontAwesome6 
+                  name={flash === 'on' ? 'bolt' : flash === 'off' ? 'bolt-lightning' : 'bolt'} 
+                  size={20} 
+                  color={flash === 'off' || flash === 'auto' ? '#FFFFFF40' : 'white'} 
+                />
+              </TouchableOpacity>
+              {lockFront !== 'true' && (
+                <TouchableOpacity 
+                  className="w-12 h-12 rounded-full bg-white/20 items-center justify-center border-2 border-white/30"
+                  onPress={toggleCameraFacing}
+                >
+                  <FontAwesome6 name="rotate" size={20} color="white" />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       </View>

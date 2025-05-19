@@ -5,9 +5,10 @@ import AddPostButton from "@/components/feed/AddPostButton";
 import { Switch } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import PulseAI from "@/components/pulseAI/pulseAI";
+import VisibilityRadiusButton from "@/components/VisibilityRadiusButton";
 
 const Home = () => {
-  const { loading, isAnonymous, setIsAnonymous } = useSession();
+  const { loading, isAnonymous, setIsAnonymous, searchRadius, setSearchRadius } = useSession();
 
   if (loading) return null;
 
@@ -28,6 +29,10 @@ const Home = () => {
           thumbColor={isAnonymous ? '#f4f3f4' : '#f4f3f4'}
         />
       </View>
+      <VisibilityRadiusButton 
+        searchRadius={searchRadius}
+        setSearchRadius={setSearchRadius}
+      />
       <PulseAI />
       <AddPostButton />
     </View>

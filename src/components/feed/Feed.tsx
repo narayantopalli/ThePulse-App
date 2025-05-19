@@ -1,12 +1,11 @@
 import { View, Text, FlatList, KeyboardAvoidingView, Platform, Keyboard, TextInput, Dimensions } from "react-native";
 import { useSession } from "@/contexts/SessionContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState, useEffect, useRef } from "react";
 import FeedItem from "./FeedItem";
 import { Post } from "@/types/type";
 
 const Feed = () => {
-  const { userMetadata, location } = useSession();
+  const { userMetadata, location, feed } = useSession();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const listRef = useRef<FlatList<any>>(null);
@@ -15,21 +14,13 @@ const Feed = () => {
   useEffect(() => {
     const loadPosts = async () => {
       if (userMetadata?.id) {
-        try {
-          const storedPosts = await AsyncStorage.getItem(`feed_${userMetadata.id}`);
-          if (storedPosts) {
-            const parsedPosts = JSON.parse(storedPosts);
-            const filteredPosts = parsedPosts.filter((post: Post) => post.user_id !== userMetadata.id);
-            setPosts(filteredPosts);
-          }
-        } catch (error) {
-          console.error('Error reading from local storage:', error);
-        }
+        const posts = feed.filter((post: Post) => post.user_id !== userMetadata.id);
+        setPosts(posts);
         setLoadingPosts(false);
       }
     };
     loadPosts();
-  }, [location]);
+  }, [location, feed]);
 
   const focusRow = (rowId: string) => {
     const rowIndex = posts.findIndex(d => d.id === rowId);
@@ -75,7 +66,7 @@ const Feed = () => {
             post={item} 
           />
         )}
-        contentContainerStyle={{ paddingBottom: 125 }}
+        contentContainerStyle={{ paddingTop: 50, paddingBottom: 125 }}
       />
     </KeyboardAvoidingView>
   );

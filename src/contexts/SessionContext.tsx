@@ -32,6 +32,8 @@ const SessionContext = createContext<SessionContextType>({
   isAnonymous: false,
   setIsAnonymous: () => {},
   session: null,
+  searchRadius: 5000,
+  setSearchRadius: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -48,12 +50,20 @@ export const SessionProvider = ({ children }: Props) => {
   const [feed, setFeed]                 = useState<any[]>([]);
   const [isAnonymous, setIsAnonymous]   = useState(false);
   const [session, setSession]           = useState<any>(null);
+  const [searchRadius, setSearchRadius] = useState<number>(5000);
+
+  useEffect(() => {
+    AsyncStorage.getItem('searchRadius').then((radius) => {
+      if (radius) setSearchRadius(parseInt(radius));
+    });
+  }, []);
 
   const getFeed = async (lat: number, lon: number) => {
     try {
       const { data: FeedData, error: FeedDataError } = await supabase.rpc('get_posts', {
         p_lon: lon,
         p_lat: lat,
+        p_rad: searchRadius
       });
       if (FeedDataError) throw FeedDataError;
 
@@ -100,8 +110,16 @@ export const SessionProvider = ({ children }: Props) => {
     }
   }
 
+  const getFeedFromLocalStorage = async () => {
+    if (userMetadata?.id) {
+      const storedFeed = await AsyncStorage.getItem(`feed_${userMetadata.id}`);
+      if (storedFeed) setFeed(JSON.parse(storedFeed));
+    }
+  }
+
   useEffect(() => {
     let locationSubscription: Location.LocationSubscription;
+    getFeedFromLocalStorage();
     (async () => {
       const { status } = await requestForegroundPermissionsAsync()
       if (status !== 'granted') {
@@ -113,6 +131,7 @@ export const SessionProvider = ({ children }: Props) => {
           distanceInterval: 10,
         }, (location) => {
           console.log("location:", location);
+          console.log("refreshed feed", feed);
           setLocation([location.coords.latitude, location.coords.longitude])
           getFeed(location.coords.latitude, location.coords.longitude);
         })
@@ -123,7 +142,7 @@ export const SessionProvider = ({ children }: Props) => {
         locationSubscription.remove()
       }
     }
-  }, [])
+  }, [userMetadata, searchRadius])
 
   // Load from local storage on cold start
   useEffect(() => {
@@ -261,7 +280,9 @@ export const SessionProvider = ({ children }: Props) => {
         feed,
         isAnonymous,
         setIsAnonymous,
-        session
+        session,
+        searchRadius,
+        setSearchRadius
       }}
     >
       {children}

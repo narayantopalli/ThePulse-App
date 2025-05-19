@@ -8,6 +8,9 @@ const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
   return (
     <>
       {hotspots.map((hotspot, index) => {
+        if (hotspot.latitude === null || hotspot.longitude === null) {
+          return null;
+        }
         // Scale opacity and size based on strength
         const maxStrength = Math.max(...hotspots.map(h => h.strength));
         const strengthRatio = hotspot.strength / maxStrength;

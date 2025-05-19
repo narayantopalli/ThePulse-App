@@ -1,13 +1,17 @@
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Circle, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useRef, useEffect, useState } from "react";
 import ResetLocationButton from "@/components/map/ResetLocationButton";
 import HotspotMarkers from "./HotspotMarkers";
 import { useSession } from "@/contexts/SessionContext";
 import { Hotspot, CustomMapViewProps } from "@/types/type";
+import VisibilityRadiusButton from "../VisibilityRadiusButton";
 
 // Function to calculate distance between two points in meters
-const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+const calculateDistance = (lat1: number | null, lon1: number | null, lat2: number | null, lon2: number | null) => {
+  if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) {
+    return 0;
+  }
   const R = 6371e3; // Earth's radius in meters
   const φ1 = lat1 * Math.PI/180;
   const φ2 = lat2 * Math.PI/180;
@@ -26,7 +30,7 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 const createHotspots = (activities: any[]): Hotspot[] => {
   const hotspots: Hotspot[] = [];
   const CLUSTER_RADIUS = 300; // meters
-  const MIN_ACTIVITIES = 2; // minimum activities to form a hotspot
+  const MIN_ACTIVITIES = 3; // minimum activities to form a hotspot
 
   activities.forEach(activity => {
 
@@ -63,6 +67,12 @@ const createHotspots = (activities: any[]): Hotspot[] => {
           strength
         });
       }
+    } else {
+      hotspots.push({
+        latitude: null,
+        longitude: null,
+        strength: 0
+      });
     }
   });
 
@@ -70,7 +80,7 @@ const createHotspots = (activities: any[]): Hotspot[] => {
 };
 
 const CustomMapView = ({ region, location }: CustomMapViewProps) => {
-  const { feed } = useSession();
+  const { feed, searchRadius, setSearchRadius } = useSession();
   const mapRef = useRef<MapView>(null);
   const [hotspots, setHotspots] = useState<Hotspot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,8 +135,21 @@ const CustomMapView = ({ region, location }: CustomMapViewProps) => {
         initialRegion={region || undefined}
         showsUserLocation={true}
       >
+        <Circle
+          center={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }}
+          radius={searchRadius} // meters
+          strokeWidth={1}
+          fillColor={`rgba(191, 191, 191, 0.1)`} // Yellow, more transparent
+        />
         <HotspotMarkers hotspots={hotspots} />
       </MapView>
+      <VisibilityRadiusButton 
+        searchRadius={searchRadius}
+        setSearchRadius={setSearchRadius}
+      />
       <ResetLocationButton onPress={resetMapView} />
     </View>
   );

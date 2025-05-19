@@ -18,7 +18,11 @@
       "googleClientId": "394007137559-cm20hr440kfiu43flfpv740eekjris9j.apps.googleusercontent.com",
       "supabaseUrl": "https://jiyifcajwwakzoorzfdx.supabase.co",
       "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppeWlmY2Fqd3dha3pvb3J6ZmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzIyODMsImV4cCI6MjA2Mjc0ODI4M30.3uvD9KJ5cZUtdpVl4njMA2hcbRIUK2tNKj3lwGFUzPA",
-      "GeminiApiKey": "AIzaSyD_PWbKkhgp0y3kLHsY9q9Li0XOs2Nt0bA"
+      "GeminiApiKey": "AIzaSyD_PWbKkhgp0y3kLHsY9q9Li0XOs2Nt0bA",
+      "router": {},
+      "eas": {
+        "projectId": "9494007a-fbe9-482a-8d08-acf08c20c5bd"
+      }
     },
     "ios": {
       "supportsTablet": true,
@@ -26,7 +30,8 @@
         "NSCameraUsageDescription": "This app needs camera access to take photos",
         "NSMicrophoneUsageDescription": "This app needs microphone access to record videos",
         "NSLocationWhenInUseUsageDescription": "This app needs access to your location to show it on the map",
-        "NSLocationAlwaysUsageDescription": "This app needs access to your location to show it on the map"
+        "NSLocationAlwaysUsageDescription": "This app needs access to your location to show it on the map",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.narayant.thepulse"
@@ -41,7 +46,14 @@
         "RECORD_AUDIO",
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "package": "com.narayant.thepulse"
     },
