@@ -1,16 +1,13 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View } from "react-native";
 import { Circle } from 'react-native-maps';
 import { HotspotMarkersProps } from "@/types/type";
 
-const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
+const HotspotMarkers = memo(({ hotspots }: HotspotMarkersProps) => {
 
   return (
     <>
       {hotspots.map((hotspot, index) => {
-        if (hotspot.latitude === null || hotspot.longitude === null) {
-          return null;
-        }
         // Scale opacity and size based on strength
         const maxStrength = Math.max(...hotspots.map(h => h.strength));
         const strengthRatio = hotspot.strength / maxStrength;
@@ -28,7 +25,7 @@ const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
                 longitude: randomOffsetLon,
               }}
               radius={300 * strengthRatio * randomSizeOffset} // meters
-              strokeWidth={0}
+              strokeColor="transparent"
               fillColor={`rgba(255, 255, 0, ${0.1 * strengthRatio})`} // Yellow, more transparent
             />
             <Circle
@@ -37,7 +34,7 @@ const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
                 longitude: randomOffsetLon,
               }}
               radius={200 * strengthRatio * randomSizeOffset} // meters
-              strokeWidth={0}
+              strokeColor="transparent"
               fillColor={`rgba(255, 165, 0, ${0.3 * strengthRatio})`} // Orange, medium transparency
             />
             <Circle
@@ -46,7 +43,7 @@ const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
                 longitude: randomOffsetLon,
               }}
               radius={100 * strengthRatio * randomSizeOffset} // meters
-              strokeWidth={0}
+              strokeColor="transparent"
               fillColor={`rgba(255, 0, 0, ${0.6 * strengthRatio})`} // Red, less transparent
             />
           </View>
@@ -54,6 +51,6 @@ const HotspotMarkers = ({ hotspots }: HotspotMarkersProps) => {
       })}
     </>
   );
-};
+});
 
 export default HotspotMarkers;

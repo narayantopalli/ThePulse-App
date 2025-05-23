@@ -63,7 +63,7 @@ const PasswordEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-600">
+    <View className="flex-1 bg-general-300">
       <View className="flex-1 mx-4 mt-4">
           <View className="bg-white border-2 border-black rounded-2xl h-64 p-4">
               {step === "verify" ? (

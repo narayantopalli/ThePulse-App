@@ -42,7 +42,7 @@ const NameEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-600">
+    <View className="flex-1 bg-general-300">
       <View className="flex-1 mx-4 mt-4">
           <View className="space-y-4">
               <View className="bg-white border-2 border-black rounded-2xl h-16 p-4">
@@ -52,6 +52,8 @@ const NameEdit = () => {
                       placeholder="First name..."
                       value={firstName}
                       onChangeText={setFirstName}
+                      autoCorrect={true}
+                      autoCapitalize="sentences"
                   />
               </View>
               <View className="bg-white border-2 border-black rounded-2xl h-16 p-4 mt-4">
@@ -60,6 +62,8 @@ const NameEdit = () => {
                       placeholder="Last name..."
                       value={lastName}
                       onChangeText={setLastName}
+                      autoCorrect={true}
+                      autoCapitalize="sentences"
                   />
               </View>
           </View>

@@ -7,7 +7,6 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { getLocationString } from '@/hooks/getLocationString';
 import { FontAwesome6 } from '@expo/vector-icons';
-import { UUIDhash } from '@/utils/hash';
 import { PostUploaderProps } from '@/types/type';
 
 const PostUploader = ({
@@ -65,7 +64,7 @@ const PostUploader = ({
 
             // Create post in database
             const postResult = await supabase.from("posts").insert({
-                user_id: postAnonymous ? UUIDhash(userMetadata?.id) : userMetadata?.id,
+                user_id: userMetadata?.id,
                 location_string: locationString,
                 data: {
                     image_url: postPhoto ? `posts/${postPhoto.split("/").pop()}` : null,

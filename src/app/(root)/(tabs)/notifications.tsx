@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, RefreshControl } from "react-native";
 import { useSession } from "@/contexts/SessionContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useEffect, useState } from "react";
@@ -11,35 +11,49 @@ const Notifications = () => {
     handleIgnore,
     fetchNotifications
   } = useNotifications(notifications, setNotifications);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    if (userMetadata?.id) {
-      fetchNotifications();
-    }
-  }, [userMetadata?.id]);
+    fetchNotifications();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
 
   if (loading || !userMetadata?.id) return null;
 
   return (
     <View className="flex-1 bg-general-300">
       <View className="flex-1 px-4 mt-4">
-        {notifications.length === 0 ? (
-          <View className="flex-1 items-center mt-[50%]">
-            <Text className="text-black">No notifications!</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={notifications}
-            keyExtractor={(item) => Math.random().toString()}
-            renderItem={({ item }) => (
-              <NotificationItem
-                item={item}
-                onIgnore={handleIgnore}
-                currentUserId={userMetadata.id}
-              />
-            )}
-          />
-        )}
+        <FlatList
+          data={notifications}
+          keyExtractor={(item) => Math.random().toString()}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#000000"]}
+              tintColor="#000000"
+            />
+          }
+          ListEmptyComponent={() => (
+            <View className="flex-1 items-center justify-center py-8 mt-10">
+              <Text className="text-gray-500 text-lg">No notifications yet!</Text>
+              <Text className="text-gray-400 text-sm mt-2">Swipe down to refresh</Text>
+            </View>
+          )}
+          renderItem={({ item }) => (
+            <NotificationItem
+              item={item}
+              onIgnore={handleIgnore}
+              currentUserId={userMetadata.id}
+            />
+          )}
+        />
       </View>
     </View>
   );

@@ -3,13 +3,13 @@
     "name": "ThePulse",
     "slug": "ThePulse",
     "scheme": "ThePulse",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/adaptive-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,6 +19,8 @@
       "supabaseUrl": "https://jiyifcajwwakzoorzfdx.supabase.co",
       "supabaseKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppeWlmY2Fqd3dha3pvb3J6ZmR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNzIyODMsImV4cCI6MjA2Mjc0ODI4M30.3uvD9KJ5cZUtdpVl4njMA2hcbRIUK2tNKj3lwGFUzPA",
       "GeminiApiKey": "AIzaSyD_PWbKkhgp0y3kLHsY9q9Li0XOs2Nt0bA",
+      "REVENUECAT_IOS_KEY": "appl_OWeDYsIwSnoFrpUgJFCYJURcxfK",
+      "REVENUECAT_ANDROID_KEY": "goog_00000000000000000000000000000000",
       "router": {},
       "eas": {
         "projectId": "9494007a-fbe9-482a-8d08-acf08c20c5bd"

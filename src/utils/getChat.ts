@@ -1,60 +1,39 @@
-import Constants from "expo-constants";
+import { FeedPost } from '@/types/type';
+import { supabase } from './supabase';
+import Constants from 'expo-constants';
 
+interface GetChatParams {
+  feed: FeedPost[];
+  setIsFetching: (isFetching: boolean) => void;
+}
 
-async function getResponse(prompt: string) {
-    const apiKey = Constants.expoConfig?.extra?.GeminiApiKey;
+export const getChat = async ({ feed, setIsFetching }: GetChatParams): Promise<string> => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
     
-    if (!apiKey) {
-        throw new Error('Gemini API key is not configured');
+    if (!session) {
+      throw new Error('No active session');
     }
 
-    const systemPrompt = "You are an old irish man. Give the user a vague summary of the feed. Strictly keep it under 25 words.";
-    const fullPrompt = `${systemPrompt}\n\nUser request: ${prompt}`;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            contents: [{
-                parts: [{
-                    text: fullPrompt
-                }]
-            }]
-        }),
+    const response = await fetch(`${Constants.expoConfig?.extra?.supabaseUrl}/functions/v1/aichat`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ feed }),
     });
-    
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(`Gemini API error: ${response.status} ${error.error?.message || response.statusText}`);
-    }
-    
-    const data = await response.json();
-    return {
-        choices: [{
-            message: {
-                content: data.candidates[0].content.parts[0].text
-            }
-        }]
-    };
-}
 
-export const getChat = async ({ feed, setIsFetching }: { feed: any[], setIsFetching: (isFetching: boolean) => void }): Promise<string> => {
-    let postData = "";
-    let numPosts = 0;
-    for (const post of feed) {
-        postData += `post ${numPosts + 1}: ` + JSON.stringify(post.data.post_data) + " created at: " + post.created_at + " near: " + post.location_string + "\n";
-        numPosts++;
+    if (!response.ok) {
+      throw new Error('Failed to get chat response');
     }
-    try {
-        const response = await getResponse(postData);
-        setIsFetching(false);
-        const responseText = response.choices[0].message.content;
-        console.log("Gemini response:", responseText);
-        return responseText;
-    } catch (error) {
-        console.log('Error calling Gemini API:', error);
-        return "";
-    }
-}
+
+    const data = await response.json();
+    return data.message;
+  } catch (error) {
+    console.error('Error in getChat:', error);
+    throw error;
+  } finally {
+    setIsFetching(false);
+  }
+};

@@ -29,7 +29,7 @@ const GenderEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-600">
+    <View className="flex-1 bg-general-300">
       <View className="flex-1 mx-4 mt-4">
         <GenderOption
           title="He/Him"

@@ -1,9 +1,8 @@
-import { Text, View, TextInput, TouchableOpacity, Keyboard, FlatList } from "react-native";
-import { useState, forwardRef } from "react";
+import { Text, View, TextInput, TouchableOpacity, Keyboard } from "react-native";
+import { useState } from "react";
 import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/utils/supabase";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { UUIDhash } from "@/utils/hash";
 import { ResponsePostContentProps } from "@/types/type";
 
 const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: ResponsePostContentProps) => {
@@ -34,7 +33,7 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
         .insert({
           post_id: postId,
           user_id: user_id,
-          sender_id: isAnonymous ? UUIDhash(userMetadata?.id) : userMetadata?.id,
+          sender_id: userMetadata?.id,
           data: {
             anonymous: isAnonymous,
             type: 'response',
@@ -60,7 +59,7 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
       
       <View className="bg-white rounded-xl p-3 mb-3">
         <TextInput
-          ref={el => inputRefs.current[postId] = el}
+          ref={el => { inputRefs.current[postId] = el }}
           onFocus={() => onFocus(postId)}
           className="text-black text-base font-JakartaMedium min-h-[80px]"
           placeholder="Write your response..."
@@ -118,4 +117,4 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
   );
 };
 
-export default ResponsePostContent; 
+export default ResponsePostContent;

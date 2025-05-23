@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/utils/supabase';
 import { useSession } from '@/contexts/SessionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocalImageURI } from '@/utils/getImage';
-import { UUIDhash } from '@/utils/hash';
 
 export const useNotifications = (notifications: any[], setNotifications: any) => {
   const { userMetadata } = useSession();
@@ -32,7 +31,7 @@ export const useNotifications = (notifications: any[], setNotifications: any) =>
       const { data: notificationsData, error: notificationsError } = await supabase
         .from('notifications')
         .select('*')
-        .or(`user_id.eq.${userMetadata?.id},user_id.eq.${UUIDhash(userMetadata?.id)}`)
+        .eq('user_id', userMetadata?.id)
         .order('created_at', { ascending: false });
 
       if (notificationsError) throw notificationsError;

@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, TextInput, TouchableOpacity, Text } from 'react-native';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { PollPostProps } from '@/types/type';
 
-const PollPost = ({ question, options, onQuestionChange, onOptionsChange }: PollPostProps) => {
+const PollPost = forwardRef<TextInput, PollPostProps>(({ 
+  question, 
+  options, 
+  onQuestionChange, 
+  onOptionsChange 
+}, ref) => {
   const addOption = () => {
     if (options.length < 4) {
       onOptionsChange([...options, '']);
@@ -24,6 +29,7 @@ const PollPost = ({ question, options, onQuestionChange, onOptionsChange }: Poll
   return (
     <View className="bg-white rounded-2xl p-4 pt-2 mb-4 shadow-sm border border-gray-100">
       <TextInput
+        ref={ref}
         className="text-black text-xl font-JakartaMedium mb-4 h-12 border-b border-gray-100"
         placeholder="Ask a question..."
         placeholderTextColor="#9CA3AF"
@@ -53,14 +59,14 @@ const PollPost = ({ question, options, onQuestionChange, onOptionsChange }: Poll
       {options.length < 4 && (
         <TouchableOpacity 
           onPress={addOption}
-          className="flex-row items-center mt-2 bg-gray-50 py-3 px-4 rounded-xl self-start"
+          className="flex-row items-center justify-center py-2 mt-2"
         >
-          <FontAwesome6 name="plus" size={16} color="#4B5563" />
-          <Text className="text-general-800 font-JakartaMedium ml-2">Add Option</Text>
+          <FontAwesome6 name="plus" size={14} color="#9CA3AF" />
+          <Text className="text-gray-400 font-JakartaMedium ml-2">Add Option</Text>
         </TouchableOpacity>
       )}
     </View>
   );
-};
+});
 
 export default PollPost;

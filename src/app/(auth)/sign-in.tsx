@@ -1,7 +1,7 @@
 import { images } from "@/constants";
 import { router } from "expo-router";
-import { Text, View, Image, Platform, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { useState, useEffect } from "react";
+import { Text, View, Image, Platform, StyleSheet, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { useState, useRef } from "react";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
@@ -16,7 +16,9 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { userMetadata } = useSession();
+  
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
 
   // useEffect(() => {
   //   GoogleSignin.configure({
@@ -139,129 +141,137 @@ const SignIn = () => {
   // };
 
   return (
-    <View className="flex-1 bg-white">
-      <View className="relative">
-        <Image 
-          source={images.getStarted} 
-          className="w-full h-[300px]"
-          style={styles.headerImage}
-        />
-        <View className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
-          <Text className="text-3xl text-black font-JakartaSemiBold">
-            Welcome Back
-          </Text>
-          <Text className="text-base text-gray-300 mt-2 font-JakartaRegular">
-            Choose your preferred sign in method
-          </Text>
-        </View>
-      </View>
-
-      <View className="flex-1 px-6 pt-8">
-        {errorMessage ? (
-          <View className="bg-red-50 p-4 rounded-lg mb-6 border border-red-100">
-            <Text className="text-red-500 text-center font-JakartaMedium">
-              {errorMessage}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View className="flex-1 bg-white">
+        <View className="relative">
+          <Image 
+            source={images.getStarted} 
+            className="w-full h-72"
+            style={styles.headerImage}
+          />
+          <View className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
+            <Text className="text-3xl text-black font-JakartaSemiBold">
+              Welcome Back
+            </Text>
+            <Text className="text-base text-gray-300 mt-2 font-JakartaRegular">
+              Choose your preferred sign in method
             </Text>
           </View>
-        ) : null}
+        </View>
 
-        <View className="flex-1 space-y-8">
-          <View className="space-y-5">
-            <View>
-              <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium">Email</Text>
-              <View className="relative">
-                <TextInput
-                  className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
+        <View className="flex-1 px-6 pt-8">
+          {errorMessage ? (
+            <View className="bg-red-50 p-4 rounded-lg mb-6 border border-red-100">
+              <Text className="text-red-500 text-center font-JakartaMedium">
+                {errorMessage}
+              </Text>
             </View>
-            <View>
-              <Text className="text-sm text-gray-600 mb-2 mt-2 font-JakartaMedium">Password</Text>
-              <View className="relative">
-                <TextInput
-                  className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  placeholderTextColor="#9CA3AF"
-                />
+          ) : null}
+
+          <View className="flex-1 space-y-8">
+            <View className="space-y-5">
+              <View>
+                <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium">Email</Text>
+                <View className="relative">
+                  <TextInput
+                    ref={emailInputRef}
+                    className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    placeholderTextColor="#9CA3AF"
+                    returnKeyType="next"
+                    onSubmitEditing={() => passwordInputRef.current?.focus()}
+                  />
+                </View>
               </View>
-              <TouchableOpacity 
-                onPress={() => router.push("/(auth)/forgot-password")}
-                className="mt-2"
+              <View>
+                <Text className="text-sm text-gray-600 mb-2 mt-2 font-JakartaMedium">Password</Text>
+                <View className="relative">
+                  <TextInput
+                    ref={passwordInputRef}
+                    className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    placeholderTextColor="#9CA3AF"
+                    returnKeyType="done"
+                    onSubmitEditing={handleEmailSignIn}
+                  />
+                </View>
+                <TouchableOpacity 
+                  onPress={() => router.push("/(auth)/forgot-password")}
+                  className="mt-2"
+                >
+                  <Text className="text-sm text-gray-600 font-JakartaMedium">
+                    Forgot Password?
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                className="w-full h-14 bg-black rounded-xl items-center justify-center shadow-sm mt-6 mb-4"
+                onPress={handleEmailSignIn}
+                disabled={isLoading}
+                style={styles.signInButton}
               >
-                <Text className="text-sm text-gray-600 font-JakartaMedium">
-                  Forgot Password?
+                <Text className="text-white font-JakartaSemiBold text-base">
+                  {isLoading ? "Signing in..." : "Sign In"}
                 </Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              className="w-full h-14 bg-black rounded-xl items-center justify-center shadow-sm mt-6 mb-4"
-              onPress={handleEmailSignIn}
-              disabled={isLoading}
-              style={styles.signInButton}
-            >
-              <Text className="text-white font-JakartaSemiBold text-base">
-                {isLoading ? "Signing in..." : "Sign In"}
+
+            <View className="flex-row items-center justify-center space-x-4 mb-1">
+              <View className="flex-1 h-[1px] bg-gray-200" />
+              <Text className="text-gray-500 font-JakartaRegular">or continue with</Text>
+              <View className="flex-1 h-[1px] bg-gray-200" />
+            </View>
+
+            <View className="items-center space-y-4">
+              {Platform.OS === 'ios' ? (
+                <View className="w-full items-center space-y-4">
+                  <AppleAuthentication.AppleAuthenticationButton
+                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                    cornerRadius={12}
+                    style={[styles.appleButton, { marginTop: 8 }]}
+                    onPress={handleAppleSignIn}
+                  />
+                  <Text className="text-sm text-gray-500 font-JakartaRegular mt-2">
+                    Secure sign in with your Apple ID
+                  </Text>
+                </View>
+              ) : (
+                <View className="items-center">
+                  <Text className="text-xl text-gray-800 font-JakartaSemiBold mb-2">
+                    Coming Soon
+                  </Text>
+                  <Text className="text-base text-gray-600 text-center font-JakartaRegular">
+                    Apple Sign In is currently only available on iOS devices
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <View className="items-center mt-4">
+              <Text className="text-gray-600 font-JakartaRegular mb-2">
+                Don't have an account?
               </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View className="flex-row items-center justify-center space-x-4 mb-1">
-            <View className="flex-1 h-[1px] bg-gray-200" />
-            <Text className="text-gray-500 font-JakartaRegular">or continue with</Text>
-            <View className="flex-1 h-[1px] bg-gray-200" />
-          </View>
-
-          <View className="items-center space-y-4">
-            {Platform.OS === 'ios' ? (
-              <View className="w-full items-center space-y-4">
-                <AppleAuthentication.AppleAuthenticationButton
-                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                  cornerRadius={12}
-                  style={[styles.appleButton, { marginTop: 8 }]}
-                  onPress={handleAppleSignIn}
-                />
-                <Text className="text-sm text-gray-500 font-JakartaRegular mt-2">
-                  Secure sign in with your Apple ID
+              <TouchableOpacity
+                onPress={() => router.push("/(auth)/sign-up")}
+                className="px-6 py-2 rounded-full border border-gray-200"
+              >
+                <Text className="text-black font-JakartaSemiBold">
+                  Create Account
                 </Text>
-              </View>
-            ) : (
-              <View className="items-center">
-                <Text className="text-xl text-gray-800 font-JakartaSemiBold mb-2">
-                  Coming Soon
-                </Text>
-                <Text className="text-base text-gray-600 text-center font-JakartaRegular">
-                  Apple Sign In is currently only available on iOS devices
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <View className="items-center mt-4">
-            <Text className="text-gray-600 font-JakartaRegular mb-2">
-              Don't have an account?
-            </Text>
-            <TouchableOpacity
-              onPress={() => router.push("/(auth)/sign-up")}
-              className="px-6 py-2 rounded-full border border-gray-200"
-            >
-              <Text className="text-black font-JakartaSemiBold">
-                Create Account
-              </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 

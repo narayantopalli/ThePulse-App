@@ -33,7 +33,7 @@ const PollInfo = ({
           option_index,
           created_at,
           anonymous,
-          user_data:profiles!polls_id_fkey (
+          user_data:profiles!poll_votes_user_id_fkey (
             firstname,
             lastname,
             avatar_url

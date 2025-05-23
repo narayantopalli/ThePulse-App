@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, Alert, Keyboard, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Keyboard, ScrollView, KeyboardAvoidingView, Platform, TextInput } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useSession } from "@/contexts/SessionContext";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -22,24 +22,15 @@ const CreatePost = () => {
   const [postType, setPostType] = useState<PostType>('text');
   const [caption, setCaption] = useState("");
   const [pollOptions, setPollOptions] = useState(['', '']);
-  const scrollViewRef = useRef<ScrollView>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [visibilityDistance, setVisibilityDistance] = useState<number>(5000);
+  const [visibilityDistance, setVisibilityDistance] = useState<number>(4828);
   const [postAnonymous, setPostAnonymous] = useState<boolean>(isAnonymous);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const inputRefs = useRef<Record<string, TextInput | null>>({});
 
   useEffect(() => {
     setErrorMessage("");
   }, [postType, caption]);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    });
-
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const pickImage = async () => {
     Keyboard.dismiss();
@@ -55,7 +46,7 @@ const CreatePost = () => {
           [
             {
               text: "Camera",
-              onPress: () => router.push({pathname: "/camera", params: { path: "/(edit)/create-post" }})
+              onPress: () => router.push({pathname: "/(root)/camera", params: { path: "/(root)/(edit)/create-post" }})
             },
             {
               text: "Photo Library", 
@@ -90,6 +81,7 @@ const CreatePost = () => {
           <TextPost 
             text={caption} 
             onChangeText={setCaption} 
+            ref={(el) => { inputRefs.current['text'] = el; }}
           />
         );
       case 'poll':
@@ -99,6 +91,7 @@ const CreatePost = () => {
             options={pollOptions}
             onQuestionChange={setCaption}
             onOptionsChange={setPollOptions}
+            ref={(el) => { inputRefs.current['poll'] = el; }}
           />
         );
       case 'response':
@@ -106,13 +99,14 @@ const CreatePost = () => {
           <ResponsePost 
             prompt={caption}
             onPromptChange={setCaption}
+            ref={(el) => { inputRefs.current['response'] = el; }}
           />
         );
     }
   };
 
   return (
-    <View className="flex-1 bg-gray-800">
+    <View className="flex-1 bg-gray-900">
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -123,6 +117,7 @@ const CreatePost = () => {
           className="flex-1"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           <View className="flex-1 mx-4 mt-4 pb-12">
             {errorMessage && <ErrorMessage message={errorMessage} />}
@@ -130,38 +125,38 @@ const CreatePost = () => {
               <TouchableOpacity 
                 onPress={pickImage}
                 className={`flex-row items-center space-x-2 px-4 py-3 rounded-xl border shadow-sm ${
-                  postPhoto ? 'bg-gray-300 border-gray-300' : 'bg-white border-gray-200'
+                  postPhoto ? 'bg-gray-700 border-gray-700' : 'bg-gray-800 border-gray-700'
                 }`}
               >
-                <FontAwesome6 name="image" size={18} color={postPhoto ? "#FFFFFF" : "#4B5563"} />
-                <Text className={`font-JakartaMedium text-sm ml-1 ${postPhoto ? 'text-white' : 'text-gray-700'}`}>Add Photo</Text>
+                <FontAwesome6 name="image" size={18} color={postPhoto ? "#FFFFFF" : "#9CA3AF"} />
+                <Text className={`font-JakartaMedium text-sm ml-1 ${postPhoto ? 'text-white' : 'text-gray-300'}`}>Add Photo</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={() => setPostType('text')}
                 className={`flex-row items-center space-x-2 px-4 py-3 rounded-xl border shadow-sm ${
-                  postType === 'text' ? 'bg-blue-300 border-blue-300' : 'bg-white border-gray-200'
+                  postType === 'text' ? 'bg-blue-600 border-blue-600' : 'bg-gray-800 border-gray-700'
                 }`}
               >
-                <FontAwesome6 name="pen" size={18} color={postType === 'text' ? "#FFFFFF" : "#4B5563"} />
-                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'text' ? 'text-white' : 'text-gray-700'}`}>Text</Text>
+                <FontAwesome6 name="pen" size={18} color={postType === 'text' ? "#FFFFFF" : "#9CA3AF"} />
+                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'text' ? 'text-white' : 'text-gray-300'}`}>Text</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={() => setPostType('poll')}
                 className={`flex-row items-center space-x-2 px-4 py-3 rounded-xl border shadow-sm ${
-                  postType === 'poll' ? 'bg-purple-300 border-purple-300' : 'bg-white border-gray-200'
+                  postType === 'poll' ? 'bg-purple-600 border-purple-600' : 'bg-gray-800 border-gray-700'
                 }`}
               >
-                <FontAwesome6 name="chart-simple" size={18} color={postType === 'poll' ? "#FFFFFF" : "#4B5563"} />
-                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'poll' ? 'text-white' : 'text-gray-700'}`}>Poll</Text>
+                <FontAwesome6 name="chart-simple" size={18} color={postType === 'poll' ? "#FFFFFF" : "#9CA3AF"} />
+                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'poll' ? 'text-white' : 'text-gray-300'}`}>Poll</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 onPress={() => setPostType('response')}
                 className={`flex-row items-center space-x-2 px-4 py-3 rounded-xl border shadow-sm ${
-                  postType === 'response' ? 'bg-amber-300 border-amber-300' : 'bg-white border-gray-200'
+                  postType === 'response' ? 'bg-amber-600 border-amber-600' : 'bg-gray-800 border-gray-700'
                 }`}
               >
-                <FontAwesome6 name="comments" size={18} color={postType === 'response' ? "#FFFFFF" : "#4B5563"} />
-                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'response' ? 'text-white' : 'text-gray-700'}`}>Response</Text>
+                <FontAwesome6 name="comments" size={18} color={postType === 'response' ? "#FFFFFF" : "#9CA3AF"} />
+                <Text className={`font-JakartaMedium text-sm ml-1 ${postType === 'response' ? 'text-white' : 'text-gray-300'}`}>Response</Text>
               </TouchableOpacity>
             </View>
 

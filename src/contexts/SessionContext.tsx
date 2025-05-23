@@ -17,6 +17,7 @@ import { requestForegroundPermissionsAsync } from "expo-location";
 import { watchPositionAsync } from "expo-location";
 import { Accuracy } from "expo-location";
 import { SessionContextType, UserMetadata } from "@/types/type";
+import { resetFeed } from "@/utils/nextFeed";
 
 const BUCKET           = "images";   // storage bucket
 const STORAGE_KEY      = "LOCAL_AVATAR_PATH";
@@ -29,6 +30,7 @@ const SessionContext = createContext<SessionContextType>({
   updateProfilePhoto: async () => {},
   location: null,
   feed: [],
+  setFeed: () => {},
   isAnonymous: false,
   setIsAnonymous: () => {},
   session: null,
@@ -36,6 +38,8 @@ const SessionContext = createContext<SessionContextType>({
   setSearchRadius: () => {},
   blockedPosts: [],
   setBlockedPosts: () => {},
+  myPosts: [],
+  setMyPosts: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -52,8 +56,9 @@ export const SessionProvider = ({ children }: Props) => {
   const [feed, setFeed]                 = useState<any[]>([]);
   const [isAnonymous, setIsAnonymous]   = useState(false);
   const [session, setSession]           = useState<any>(null);
-  const [searchRadius, setSearchRadius] = useState<number>(5000);
+  const [searchRadius, setSearchRadius] = useState<number>(4828);
   const [blockedPosts, setBlockedPosts] = useState<string[]>([]);
+  const [myPosts, setMyPosts] = useState<any[]>([]);
 
   useEffect(() => {
     AsyncStorage.getItem('searchRadius').then((radius) => {
@@ -68,77 +73,65 @@ export const SessionProvider = ({ children }: Props) => {
     });
   }, []);
 
-  const getFeed = async (lat: number, lon: number) => {
-    try {
-      const { data: FeedData, error: FeedDataError } = await supabase.rpc('get_posts', {
-        p_lon: lon,
-        p_lat: lat,
-        p_rad: searchRadius
-      });
-      if (FeedDataError) throw FeedDataError;
+  useEffect(() => {
+    const loadMyPostsFromDatabase = async () => {
+      if (!userMetadata?.id) return;
 
-      const userIDs = FeedData.map((post: any) => post.user_id);
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('user_id', userMetadata?.id)
+        .order('created_at', { ascending: false });
 
-      const { data: UserData, error: UserDataError } = await supabase.from('profiles')
-        .select('id, avatar_url, firstname, lastname')
-        .in('id', userIDs);
-
-      const feedWithUserData = await Promise.all(FeedData.map(async (post: any) => {
-        const userData = (UserData || []).find((user: any) => user.id === post.user_id);
-        let imageUrl = null;
-        if (post.data.image_url) {
-          imageUrl = await getLocalImageURI(post.data.image_url);
+      if (data) {
+        const postsWithImage = await Promise.all(
+          data.map(async (post) => ({
+            ...post,
+            image_url: post.data.image_url ? await getLocalImageURI(post.data.image_url) : null
+          }))
+        );
+        setMyPosts(postsWithImage);
+        if (userMetadata?.id) {
+          await AsyncStorage.setItem(`my_posts_${userMetadata.id}`, JSON.stringify(postsWithImage));
         }
-        let avatarUrl = null;
-        if (userData) {
-          avatarUrl = await getLocalImageURI(userData.avatar_url);
-        }
-        return {
-          ...post,
-          data: {
-            ...post.data,
-            image_url: post.data.image_url ? imageUrl : null
-          },
-          user_data: {
-            ...userData,
-            avatar_url: avatarUrl
-          }
-        };
-      }));
-
-      // remove blocked posts from feed
-      const feedWithoutBlockedPosts = feedWithUserData.filter((post) => !blockedPosts.includes(post.id));
-
-      // Sort feed by created_at in descending order (newest first)
-      const sortedFeed = feedWithoutBlockedPosts
-        .filter((post): post is NonNullable<typeof post> => post !== null)
-        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-      setFeed(sortedFeed);
-      if (userMetadata?.id) {
-        AsyncStorage.setItem(`feed_${userMetadata.id}`, JSON.stringify(sortedFeed));
       }
-    } catch (error) {
-      console.error('Error fetching feed:', error);
     }
-  }
+    const loadMyPostsFromLocalStorage = async () => {
+      if (userMetadata?.id) {
+        try {
+          const storedPosts = await AsyncStorage.getItem(`my_posts_${userMetadata.id}`);
+          if (storedPosts) {
+            setMyPosts(JSON.parse(storedPosts));
+          }
+        } catch (error) {
+          console.error('Error reading from local storage:', error);
+        }
+      }
+    };
+    loadMyPostsFromLocalStorage();
+    loadMyPostsFromDatabase();
+  }, [location, userMetadata]);
 
-  const getFeedFromLocalStorage = async () => {
+  const getFeedFromLocalStorage = async (): Promise<any[]> => {
     if (userMetadata?.id) {
       const storedFeed = await AsyncStorage.getItem(`feed_${userMetadata.id}`);
-      const filteredFeed = (JSON.parse(storedFeed || '[]') as any[]).filter((post) => !blockedPosts.includes(post.id));
-      setFeed(filteredFeed);
+      if (storedFeed) {
+        return JSON.parse(storedFeed);
+      }
     }
+    return [];
   }
 
   useEffect(() => {
-    getFeedFromLocalStorage();
-  }, [blockedPosts])
+    if (location) {
+      getFeed(location[0], location[1]);
+    }
+  }, [])
 
   useEffect(() => {
     let locationSubscription: Location.LocationSubscription;
-    getFeedFromLocalStorage();
     (async () => {
+      setFeed(await getFeedFromLocalStorage());
       const { status } = await requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         console.log('Permission to access location was denied')
@@ -148,10 +141,8 @@ export const SessionProvider = ({ children }: Props) => {
           timeInterval: 1000,
           distanceInterval: 10,
         }, (location) => {
-          console.log("location:", location);
-          console.log("refreshed feed", feed);
+          console.log("location:", {latitude: location.coords.latitude, longitude: location.coords.longitude});
           setLocation([location.coords.latitude, location.coords.longitude])
-          getFeed(location.coords.latitude, location.coords.longitude);
         })
       }
     })();
@@ -215,7 +206,6 @@ export const SessionProvider = ({ children }: Props) => {
   // Download avatar from storage to local storage when userMetadata changes
   useEffect(() => {
     if (!userMetadata?.id) return;
-
     (async () => {
       const { data: userData, error: userError } = await supabase
         .from('profiles')
@@ -242,7 +232,7 @@ export const SessionProvider = ({ children }: Props) => {
       console.error('Error fetching profile:', error);
       setUserMetadata(null);
     } else if (profile) {
-      console.log("Profile updated:", profile);
+      console.log("Profile updated!");
       setUserMetadata(profile);
     }
     AsyncStorage.setItem("USER_METADATA", JSON.stringify(profile));
@@ -286,6 +276,14 @@ export const SessionProvider = ({ children }: Props) => {
     if (profileErr) return console.error(profileErr);
   };
 
+  const getFeed = async (latitude: number, longitude: number) => {
+    const newFeed = await resetFeed(session, latitude, longitude, searchRadius, blockedPosts, 10);
+    if (newFeed.length !== 0) {
+      setFeed(newFeed);
+      AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+    }
+  };
+
   return (
     <SessionContext.Provider
       value={{ 
@@ -296,13 +294,16 @@ export const SessionProvider = ({ children }: Props) => {
         updateProfilePhoto, 
         location, 
         feed,
+        setFeed,
         isAnonymous,
         setIsAnonymous,
         session,
         searchRadius,
         setSearchRadius,
         blockedPosts,
-        setBlockedPosts
+        setBlockedPosts,
+        myPosts,
+        setMyPosts,
       }}
     >
       {children}

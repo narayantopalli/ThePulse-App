@@ -44,7 +44,7 @@ export default function Profile() {
           [
             {
               text: "Camera",
-              onPress: () => router.push({pathname: "/camera", params: { path: "/(root)/(tabs)/profile" }})
+              onPress: () => router.push({pathname: "(root)/camera", params: { path: "/(root)/(tabs)/profile" }})
             },
             {
               text: "Photo Library", 

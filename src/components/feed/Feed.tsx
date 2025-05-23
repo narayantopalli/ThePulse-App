@@ -1,29 +1,48 @@
-import { View, Text, FlatList, KeyboardAvoidingView, Platform, Keyboard, TextInput, Dimensions } from "react-native";
+import { View, Text, FlatList, KeyboardAvoidingView, Platform, Keyboard, TextInput, Dimensions, RefreshControl } from "react-native";
 import { useSession } from "@/contexts/SessionContext";
 import { useState, useEffect, useRef } from "react";
 import FeedItem from "./FeedItem";
-import { Post } from "@/types/type";
+import { resetFeed } from "@/utils/nextFeed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Feed = () => {
-  const { userMetadata, location, feed } = useSession();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(true);
+  const { feed, setFeed, session, location, searchRadius, blockedPosts, userMetadata } = useSession();
+  const [refreshing, setRefreshing] = useState(false);
   const listRef = useRef<FlatList<any>>(null);
   const inputRefs = useRef<Record<string, TextInput | null>>({});
 
   useEffect(() => {
-    const loadPosts = async () => {
-      if (userMetadata?.id) {
-        const posts = feed.filter((post: Post) => post.user_id !== userMetadata.id);
-        setPosts(posts);
-        setLoadingPosts(false);
-      }
-    };
-    loadPosts();
-  }, [location, feed]);
+    if (feed.length === 0 && location) {
+      (async () => {
+        const newFeed = await resetFeed(session, location[0], location[1], searchRadius, blockedPosts, 10);
+        setFeed(newFeed);
+        AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+      })();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (location) {
+      (async () => {
+        const newFeed = await resetFeed(session, location[0], location[1], searchRadius, blockedPosts, 10);
+        setFeed(newFeed);
+        AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+      })();
+    }
+  }, [searchRadius]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (location) {
+      const newFeed = await resetFeed(session, location[0], location[1], searchRadius, blockedPosts, 10);
+      setFeed(newFeed);
+      AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+    }
+    setRefreshing(false);
+  };
 
   const focusRow = (rowId: string) => {
-    const rowIndex = posts.findIndex(d => d.id === rowId);
+    const rowIndex = feed.findIndex(d => d.id === rowId);
     if (rowIndex !== -1) {
       listRef.current?.scrollToIndex({index: rowIndex, animated: true});
     }
@@ -31,22 +50,6 @@ const Feed = () => {
       inputRefs.current[rowId]?.focus();
     }, 250);
   };
-
-  if (loadingPosts) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-black">Loading feed...</Text>
-      </View>
-    );
-  }
-
-  if (posts.length === 0) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-black">Feed is empty</Text>
-      </View>
-    );
-  }
   
   return (
     <KeyboardAvoidingView 
@@ -55,9 +58,23 @@ const Feed = () => {
     >
       <FlatList
         ref={listRef}
-        data={posts}
+        data={feed}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#000000"]}
+            tintColor="#000000"
+          />
+        }
+        ListEmptyComponent={() => (
+          <View className="flex-1 items-center justify-center py-8">
+            <Text className="text-gray-500 text-lg">No available feed</Text>
+            <Text className="text-gray-400 text-sm mt-2">Swipe down to refresh</Text>
+          </View>
+        )}
         renderItem={({ item }) => (
           <FeedItem 
             onFocus={focusRow}

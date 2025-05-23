@@ -7,13 +7,46 @@ import PollPostContent from "./items/PollPostContent";
 import ResponsePostContent from "./items/ResponsePostContent";
 import { FeedItemProps } from "@/types/type";
 import ReportButton from "../ReportButton";
-
+import { supabase } from "@/utils/supabase";
+import { useEffect, useState } from "react";
+import { formatTimeAgo } from "@/hooks/formatTimeAgo";
 const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
   const { userMetadata } = useSession();
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(0);
 
   if (!post) {
     return null;
   }
+
+  const getLikes = async () => {
+    const { data, error } = await supabase.from('likes').select('user_id').eq('post_id', post.id);
+    if (error) {
+      console.error('Error getting likes:', error);
+    }
+    setLiked(data?.some((like) => like.user_id === userMetadata?.id) || false);
+    setLikes(data?.length || 0);
+  }
+
+  const handleLike = async () => {
+    const { error } = await supabase.from('likes').insert({ user_id: userMetadata?.id, post_id: post.id });
+    if (error) {
+      console.error('Error liking post:', error);
+    }
+    getLikes();
+  }
+
+  const handleUnlike = async () => {
+    const { error } = await supabase.from('likes').delete().eq('user_id', userMetadata?.id).eq('post_id', post.id);
+    if (error) {
+      console.error('Error unliking post:', error);
+    }
+    getLikes();
+  }
+
+  useEffect(() => {
+    getLikes();
+  }, []);
 
   const renderPostContent = () => {
     switch (post.data.type) {
@@ -38,14 +71,14 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
       <View className="flex-row items-center mb-3">
         <TouchableOpacity 
           onPress={() => !post.anonymous ? router.push({
-            pathname: post.user_id === userMetadata?.id ? "/profile" : "/(edit)/public-profile", 
+            pathname: post.user_id === userMetadata?.id ? "/profile" : "/(root)/(edit)/public-profile", 
             params: {userID: post.user_id}
           }) : null}
           className="relative"
         >
           <Image
             source={
-              post.user_data.avatar_url
+              !post.anonymous
                 ? { uri: post.user_data.avatar_url }
                 : require("assets/images/avatar-default-icon.png")
             }
@@ -82,13 +115,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
           </View>
           <View className="flex-row items-center flex-wrap">
             <Text className="text-gray-500 text-sm">
-              {new Date(post.created_at).toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true
-              })}
+              {formatTimeAgo(new Date(post.created_at))}
             </Text>
             {post.location_string && (
               <Text className="text-gray-500 text-sm ml-2">
@@ -110,6 +137,23 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
       )}
 
       {renderPostContent()}
+
+      <View className="flex-row items-center mt-4 justify-end">
+        <TouchableOpacity 
+          onPress={liked ? handleUnlike : handleLike}
+          className="flex-row items-center"
+        >
+          <FontAwesome6 
+            name="heart" 
+            size={20} 
+            color={liked ? "#ef4444" : "#6b7280"}
+            solid={liked}
+          />
+          <Text className="ml-2 text-gray-600 font-JakartaMedium">
+            {likes} {likes === 1 ? 'like' : 'likes'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

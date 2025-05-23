@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { ResponsePostProps } from '@/types/type';
 
-const ResponsePost = ({ 
+const ResponsePost = forwardRef<TextInput, ResponsePostProps>(({ 
   prompt, 
   onPromptChange, 
   placeholder = "Ask a question..." 
-}: ResponsePostProps) => {
+}, ref) => {
   return (
     <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-100">
       <Text className="text-general-700 font-JakartaMedium mb-3 text-base">Prompt for Responses</Text>
       <TextInput
+        ref={ref}
         className="text-black text-lg font-JakartaMedium mb-2 bg-gray-50 rounded-xl p-3 min-h-[100px] border border-gray-200"
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
         multiline
+        autoCorrect={true}
+        autoCapitalize="sentences"
         value={prompt}
         onChangeText={onPromptChange}
         style={styles.textInput}
@@ -24,7 +27,7 @@ const ResponsePost = ({
       </Text>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   textInput: {

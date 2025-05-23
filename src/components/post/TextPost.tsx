@@ -1,22 +1,25 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, TextInput, Text } from 'react-native';
 import { TextPostProps } from '@/types/type';
 
-const TextPost = ({ 
+const TextPost = forwardRef<TextInput, TextPostProps>(({ 
   text, 
   onChangeText, 
   placeholder = "What's on your mind?", 
   maxLength = 500 
-}: TextPostProps) => {
+}, ref) => {
   return (
     <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
       <TextInput
+        ref={ref}
         className="text-black text-lg font-JakartaMedium mb-2 min-h-[100px]"
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
         multiline
         value={text}
         onChangeText={onChangeText}
+        autoCorrect={true}
+        autoCapitalize="sentences"
         maxLength={maxLength}
         style={{ textAlignVertical: 'top' }}
       />
@@ -27,6 +30,6 @@ const TextPost = ({
       </View>
     </View>
   );
-};
+});
 
 export default TextPost;

@@ -7,18 +7,13 @@ import { getLocalImageURI } from "@/utils/getImage";
 import Status from "@/components/status";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileBio from "@/components/profile/ProfileBio";
+import AnonymousToggle from "@/components/AnonymousToggle";
 
-type FriendshipStatus = 0 | 1 | 2;
-
-export default function PublicProfile() {
+const PublicProfile = () => {
   const { userID } = useLocalSearchParams<{ userID: string }>();
-  const { userMetadata } = useSession();
+  const { isAnonymous, setIsAnonymous } = useSession();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [isFriend, setIsFriend] = useState<FriendshipStatus>(0);
-  const [isSender, setIsSender] = useState<boolean>(false);
-  const [friendshipId, setFriendshipId] = useState("");
-  const [data, setData] = useState<any>(null);
   const [localProfilePhotoURL, setLocalProfilePhotoURL] = useState("");
 
   useEffect(() => {
@@ -64,16 +59,18 @@ export default function PublicProfile() {
   }
 
   return (
-    <View className="flex-1 bg-general-600">
+    <View className="flex-1 bg-general-300">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <ProfileHeader 
           userMetadata={{
+            id: user.id,
             firstname: user.firstname,
             lastname: user.lastname,
             birthday: user.birthday,
             gender: user.gender,
             last_posted: user.last_posted,
-            avatar_url: user.avatar_url
+            avatar_url: user.avatar_url,
+            bio: user.bio,
           }}
           profilePhotoURL={localProfilePhotoURL}
           isOwnProfile={false}
@@ -93,6 +90,12 @@ export default function PublicProfile() {
           />
         </View>
       </ScrollView>
+      <AnonymousToggle 
+        isAnonymous={isAnonymous}
+        setIsAnonymous={setIsAnonymous}
+      />
     </View>
   );
 }
+
+export default PublicProfile;

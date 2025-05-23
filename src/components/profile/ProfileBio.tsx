@@ -12,7 +12,7 @@ const ProfileBio = ({ bio, isOwnProfile = false }: ProfileBioProps) => {
       <Text className="text-black text-2xl font-JakartaMedium">Bio</Text>
       <TouchableOpacity 
         className="mt-2 rounded-2xl bg-red-500"
-        onPress={() => router.replace("/(edit)/bio-edit")}
+        onPress={() => router.replace("/(root)/(edit)/bio-edit")}
         disabled={!isOwnProfile}
       >
         <View className="bg-white border-2 border-black rounded-2xl p-4">

@@ -1,119 +1,28 @@
 import { View, StyleSheet, ActivityIndicator } from "react-native";
-import MapView, { Circle, PROVIDER_GOOGLE } from 'react-native-maps';
-import { useRef, useEffect, useState } from "react";
+import MapView, { Circle } from 'react-native-maps';
+import { useRef, useState, useEffect } from "react";
 import ResetLocationButton from "@/components/map/ResetLocationButton";
 import HotspotMarkers from "./HotspotMarkers";
 import { useSession } from "@/contexts/SessionContext";
-import { Hotspot, CustomMapViewProps } from "@/types/type";
+import { CustomMapViewProps } from "@/types/type";
 import VisibilityRadiusButton from "../VisibilityRadiusButton";
 
-// Function to calculate distance between two points in meters
-const calculateDistance = (lat1: number | null, lon1: number | null, lat2: number | null, lon2: number | null) => {
-  if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) {
-    return 0;
-  }
-  const R = 6371e3; // Earth's radius in meters
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
-
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-          Math.cos(φ1) * Math.cos(φ2) *
-          Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c;
-};
-
-// Function to cluster activities into hotspots
-const createHotspots = (activities: any[]): Hotspot[] => {
-  const hotspots: Hotspot[] = [];
-  const CLUSTER_RADIUS = 300; // meters
-  const MIN_ACTIVITIES = 3; // minimum activities to form a hotspot
-
-  activities.forEach(activity => {
-
-    const [lat, lon] = [activity.latitude, activity.longitude];
-
-    // Find nearby activities
-    const nearbyActivities = activities.filter(other => {
-      const [otherLat, otherLon] = [other.latitude, other.longitude];
-      return calculateDistance(lat, lon, otherLat, otherLon) <= CLUSTER_RADIUS;
-    });
-
-    if (nearbyActivities.length >= MIN_ACTIVITIES) {
-      // Calculate average position and strength
-      const avgLat = nearbyActivities.reduce((sum, a) => {
-        return sum + a.latitude;
-      }, 0) / nearbyActivities.length;
-
-      const avgLon = nearbyActivities.reduce((sum, a) => {
-        return sum + a.longitude;
-      }, 0) / nearbyActivities.length;
-
-      // Strength is based on number of nearby activities
-      const strength = nearbyActivities.length;
-
-      // Only add if not too close to existing hotspot
-      const isTooClose = hotspots.some(hotspot => 
-        calculateDistance(hotspot.latitude, hotspot.longitude, avgLat, avgLon) < CLUSTER_RADIUS
-      );
-
-      if (!isTooClose) {
-        hotspots.push({
-          latitude: avgLat,
-          longitude: avgLon,
-          strength
-        });
-      }
-    } else {
-      hotspots.push({
-        latitude: null,
-        longitude: null,
-        strength: 0
-      });
-    }
-  });
-
-  return hotspots;
-};
-
-const CustomMapView = ({ region, location }: CustomMapViewProps) => {
-  const { feed, searchRadius, setSearchRadius } = useSession();
-  const mapRef = useRef<MapView>(null);
-  const [hotspots, setHotspots] = useState<Hotspot[]>([]);
+const CustomMapView = ({ region, setRegion, location, hotspots }: CustomMapViewProps) => {
+  const { searchRadius, setSearchRadius } = useSession();
   const [isLoading, setIsLoading] = useState(true);
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetchActivities();
     setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (hotspots[0] === undefined && feed.length > 0) {
-      const newHotspots = createHotspots(feed);
-      setHotspots(newHotspots);
-      setIsLoading(false);
-    }
-  }, [feed, hotspots]);
-
-  const fetchActivities = async () => {
-    try {
-      if (!location) return;
-    } catch (error) {
-      console.error('Error fetching activities:', error);
-    }
-  };
+  }, [hotspots]);
 
   const resetMapView = () => {
     if (location && mapRef.current) {
       mapRef.current.animateToRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        latitudeDelta: 0.004,
-        longitudeDelta: 0.004,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
       }, 1000);
     }
   };
@@ -131,8 +40,8 @@ const CustomMapView = ({ region, location }: CustomMapViewProps) => {
       <MapView 
         ref={mapRef}
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={region || undefined}
+        region={region}
+        onRegionChangeComplete={setRegion}
         showsUserLocation={true}
       >
         <Circle
@@ -140,12 +49,17 @@ const CustomMapView = ({ region, location }: CustomMapViewProps) => {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           }}
-          radius={searchRadius} // meters
+          radius={searchRadius}
           strokeWidth={1}
-          fillColor={`rgba(191, 191, 191, 0.1)`} // Yellow, more transparent
+          fillColor={`rgba(191, 191, 191, 0.3)`}
         />
         <HotspotMarkers hotspots={hotspots} />
       </MapView>
+      <View 
+        className="absolute bg-transparent bottom-0 w-full h-64"
+        pointerEvents="auto"
+        onTouchStart={() => {}}
+      />
       <VisibilityRadiusButton 
         searchRadius={searchRadius}
         setSearchRadius={setSearchRadius}

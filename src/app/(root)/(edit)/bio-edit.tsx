@@ -34,7 +34,7 @@ const BioEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-600">
+    <View className="flex-1 bg-general-300">
       <View className="flex-1 mx-4 mt-4">
           <View className="bg-white border-2 border-black rounded-2xl h-48 p-4">
               <TextInput
@@ -43,6 +43,8 @@ const BioEdit = () => {
                   placeholder="Write something about yourself..."
                   multiline
                   value={bio}
+                  autoCorrect={true}
+                  autoCapitalize="sentences"
                   onChangeText={(e) => {
                       setBio(e);
                   }}

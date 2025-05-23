@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
-import { UUIDhash } from "@/utils/hash";
 import { PollPostContentProps } from "@/types/type";
 
 const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentProps) => {
@@ -37,7 +36,7 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
         .from('poll_votes')
         .select('option_index')
         .eq('post_id', postId)
-        .eq('id', userMetadata?.id)
+        .eq('user_id', userMetadata?.id)
         .single();
 
       if (userError && userError.code !== 'PGRST116') throw userError;
@@ -69,12 +68,21 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
     setIsSubmitting(true);
 
     try {
+      // Delete any existing vote for this user and post
+      const { error: deleteError } = await supabase
+        .from('poll_votes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userMetadata?.id);
+
+      if (deleteError) throw deleteError;
+
       // Add new vote
       const { error } = await supabase
         .from('poll_votes')
-        .upsert({
+        .insert({
           post_id: postId,
-          id: userMetadata?.id,
+          user_id: userMetadata?.id,
           option_index: optionIndex,
           anonymous: isAnonymous
         });
@@ -82,13 +90,13 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
       if (error) throw error;
 
       // delete old notification
-      const { error: deleteError } = await supabase
+      const { error: deleteNotificationError } = await supabase
         .from('notifications')
         .delete()
         .eq('post_id', postId)
-        .or(`sender_id.eq.${UUIDhash(userMetadata?.id)},sender_id.eq.${userMetadata?.id}`);
+        .eq('sender_id', userMetadata?.id);
 
-      if (deleteError) throw deleteError;
+      if (deleteNotificationError) throw deleteNotificationError;
       
       // Add new notification
       const { error: notificationError } = await supabase
@@ -96,7 +104,7 @@ const PollPostContent = ({ postId, user_id, caption, options }: PollPostContentP
         .insert({
           post_id: postId,
           user_id: user_id,
-          sender_id: isAnonymous ? UUIDhash(userMetadata?.id) : userMetadata?.id,
+          sender_id: userMetadata?.id,
           data: {
             anonymous: isAnonymous,
             type: 'poll_vote',

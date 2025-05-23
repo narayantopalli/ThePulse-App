@@ -20,11 +20,11 @@ const VisibilityRadiusButton = ({ searchRadius, setSearchRadius }: VisibilityRad
   };
 
   const getVisibilityText = (value: number) => {
-    if (value >= 5000) return "Maximum";
-    if (value >= 1000) {
-      return `${(value / 1000).toFixed(1)}km`;
+    if (value >= 16093) return "Maximum"; // 16093 meters = 10 miles
+    if (value >= 804) { // 804 meters = 0.5 miles
+      return `${(value / 1609.34).toFixed(1)}mi`;
     }
-    return `${value}m`;
+    return `${100*Math.round(value * 0.0328084)}ft`; // Convert meters to feet
   };
 
   return (
@@ -64,17 +64,17 @@ const VisibilityRadiusButton = ({ searchRadius, setSearchRadius }: VisibilityRad
               <View className="flex-row items-center space-x-2">
                 <TouchableOpacity
                   onPress={() => {
-                    setTempRadius(5000);
+                    setTempRadius(16093); // 10 miles in meters
                   }}
-                  className={`px-3 py-2 rounded-lg ${tempRadius === 0 || tempRadius >= 5000 ? 'bg-blue-500' : 'bg-gray-200'}`}
+                  className={`px-3 py-2 rounded-lg ${tempRadius === 0 || tempRadius >= 16093 ? 'bg-blue-500' : 'bg-gray-200'}`}
                 >
-                  <Text className={`font-JakartaMedium ${tempRadius === 5000 ? 'text-white' : 'text-gray-700'}`}>Maximum</Text>
+                  <Text className={`font-JakartaMedium ${tempRadius === 16093 ? 'text-white' : 'text-gray-700'}`}>Maximum</Text>
                 </TouchableOpacity>
                 <View className="flex-1">
                   <Slider
                     style={{ height: 40 }}
                     minimumValue={100}
-                    maximumValue={5000}
+                    maximumValue={16093}
                     step={100}
                     value={tempRadius}
                     onValueChange={(value) => {

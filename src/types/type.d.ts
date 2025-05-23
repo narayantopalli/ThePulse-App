@@ -19,6 +19,7 @@ export interface UserMetadata {
   bio: string;
   avatar_url: string;
   last_posted: string;
+  words_left: number;
 }
 
 // Post Types
@@ -68,10 +69,17 @@ export interface ButtonProps {
 }
 
 export interface InputFieldProps {
+  label: string;
   value: string;
+  icon: any;
   onChangeText: (text: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
+  ref?: any;
+  labelStyle?: string;
+  containerStyle?: string;
+  inputStyle?: string;
+  iconStyle?: string;
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
   className?: string;
 }
@@ -178,14 +186,16 @@ export interface ResponsePostContentProps {
 
 // Map Component Props
 export interface Hotspot {
-  latitude: number | null;
-  longitude: number | null;
+  latitude: number;
+  longitude: number;
   strength: number;
 }
 
 export interface CustomMapViewProps {
   region: Region | null;
+  setRegion: (region: Region) => void;
   location: LocationObject | null;
+  hotspots: Hotspot[];
 }
 
 export interface HotspotMarkersProps {
@@ -249,6 +259,7 @@ interface SessionContextType {
   updateProfilePhoto: (res: ImagePickerSuccessResult) => Promise<void>;
   location: [number, number] | null;
   feed: any[];
+  setFeed: (value: any[]) => void;
   isAnonymous: boolean;
   setIsAnonymous: (value: boolean) => void;
   session: any;
@@ -256,6 +267,8 @@ interface SessionContextType {
   setSearchRadius: (value: number) => void;
   blockedPosts: string[];
   setBlockedPosts: (value: string[]) => void;
+  myPosts: any[];
+  setMyPosts: (value: any[]) => void;
 }
 
 // Friendship Types
@@ -280,4 +293,5 @@ export interface SharedHeaderTabsProps {
   title?: string;
   whichIcon?: number;
   showLocation?: boolean;
+  isDarkMode?: boolean;
 }

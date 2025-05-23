@@ -2,43 +2,7 @@ import { View, Text, Image, TouchableOpacity, Animated } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { router } from 'expo-router';
 import { NotificationItemProps } from '@/types/type';
-
-const formatTimeAgo = (date: Date) => {
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (diffInSeconds < 60) {
-    return 'just now';
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes}m ago`;
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `${diffInHours}h ago`;
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) {
-    return `${diffInDays}d ago`;
-  }
-
-  const diffInWeeks = Math.floor(diffInDays / 7);
-  if (diffInWeeks < 4) {
-    return `${diffInWeeks}w ago`;
-  }
-
-  const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12) {
-    return `${diffInMonths}mo ago`;
-  }
-
-  const diffInYears = Math.floor(diffInDays / 365);
-  return `${diffInYears}y ago`;
-};
+import { formatTimeAgo } from '@/hooks/formatTimeAgo';
 
 const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemProps) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -56,6 +20,8 @@ const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemPro
       return `responded: "${item.data.response_text}"`;
     } else if (item.data.type === 'poll_vote') {
       return `voted "${item.data.option_text}" on your poll`;
+    } else if (item.data.type === 'status_like') {
+      return 'liked your status';
     }
     return 'interacted with your post';
   };
@@ -77,7 +43,7 @@ const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemPro
             } else {
               router.push(
                 {
-                  pathname: `/(edit)/public-profile`,
+                  pathname: `/(root)/(edit)/public-profile`,
                   params: {
                     userID: item.sender_id
                   }

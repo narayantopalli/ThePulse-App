@@ -48,8 +48,30 @@ const PulseAI = () => {
             const newFeedIds = feed.map(post => post.id);
             const oldFeedIds = oldFeed.map(post => post.id);
             const allPostsInOldFeed = newFeedIds.every(id => oldFeedIds.includes(id));
+
+            // Check for stored chat data
+            let shouldFetchNew = true;
+            if (userMetadata?.id) {
+                try {
+                    const storedChat = await AsyncStorage.getItem(`aichat_${userMetadata.id}`);
+                    if (storedChat) {
+                        const { result, timestamp } = JSON.parse(storedChat);
+                        const storedTime = new Date(timestamp).getTime();
+                        const currentTime = new Date().getTime();
+                        const fourHoursInMs = 4 * 60 * 60 * 1000;
+                        
+                        if (currentTime - storedTime < fourHoursInMs) {
+                            setChatData(result);
+                            shouldFetchNew = false;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error reading stored chat:', error);
+                }
+            }
+
             if (((!allPostsInOldFeed) ||
-                (feed.length > 0 && chatData.length === 0)) && !isFetching) {
+                (feed.length > 0 && chatData.length === 0)) && !isFetching && shouldFetchNew) {
                 setIsFetching(true);
                 setOldFeed(feed);
                 console.log("Fetching response from AI...");
@@ -62,6 +84,10 @@ const PulseAI = () => {
                     }
                 }
                 const result = await getChat({ feed: feed, setIsFetching: setIsFetching });
+                AsyncStorage.setItem(`aichat_${userMetadata?.id}`, JSON.stringify({
+                    result,
+                    timestamp: new Date().toISOString()
+                }));
                 setChatData(result);
                 setError(null);
             }
@@ -131,7 +157,7 @@ const PulseAI = () => {
   }, [isVisible]);
 
   return (
-    <View className="absolute bottom-24 left-0 right-0">
+    <View className="absolute bottom-28 left-0 right-0">
       <Animated.View
         style={{
           transform: [{ translateX: slideAnim }],

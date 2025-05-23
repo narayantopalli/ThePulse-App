@@ -1,5 +1,5 @@
 import SharedHeaderOptions from "@/components/headers/sharedHeaderOptions";
-import { router, Stack, useLocalSearchParams, usePathname } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { useState } from "react";
 import { useEffect } from "react";
 import { View } from "react-native";
@@ -13,9 +13,6 @@ const Layout = () => {
     const path = pathname.split('/').pop();
 
     switch (path) {
-      case "update-status":
-        setGoBackPath("/camera");
-        break;
       case "create-post":
         setGoBackPath("/(root)/(tabs)/home");
         break;
@@ -32,7 +29,7 @@ const Layout = () => {
   }, [pathname]);
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-general-900">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <View className="flex-1">
         <SharedHeaderOptions goBackPath={goBackPath} />
         <Stack>
@@ -41,7 +38,6 @@ const Layout = () => {
           <Stack.Screen name="gender-edit" options={{ headerShown: false }} />
           <Stack.Screen name="name-edit" options={{ headerShown: false }} />
           <Stack.Screen name="password-edit" options={{ headerShown: false }} />
-          <Stack.Screen name="update-status" options={{ headerShown: false }} />
           <Stack.Screen name="public-profile" options={{ headerShown: false }} />
           <Stack.Screen name="create-post" options={{ headerShown: false }} />
         </Stack>

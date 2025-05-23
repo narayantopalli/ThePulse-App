@@ -3,6 +3,7 @@ import NiceButton from "@/components/buttons/niceButton";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
 import { View, TextInput, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from 'expo-file-system';
@@ -10,6 +11,8 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Location from 'expo-location';
 import Constants from 'expo-constants';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import SmallProfilePhoto from "@/components/smallProfilePhoto";
+import BackButton from "@/components/buttons/backButton";
 
 const UpdateStatus = () => {
   const { newPhotoUri } = useLocalSearchParams();
@@ -50,12 +53,13 @@ const UpdateStatus = () => {
             contentType: `image/${uri.split(".").pop()}`, 
             upsert: true 
           }),
-        supabase.from("statuses").update({
+        supabase.from("statuses").upsert({
+          id: userMetadata?.id,
           image_url: `statuses/${uri}`,
           caption: caption,
           location: location,
           created_at: last_posted
-        }).eq("id", userMetadata?.id).select()
+        })
       ]);
 
       if (uploadResult.error) throw uploadResult.error;
@@ -140,42 +144,54 @@ const UpdateStatus = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-600">
-      <View className="flex-1 mx-4 mt-4">
-        <View className="flex-row items-center justify-between bg-white border-2 border-black rounded-2xl p-2 mb-4">
-            <TouchableOpacity
-                onPress={askLocation}
-                disabled={isLoadingLocation}
-                className={`flex-row items-center justify-center w-12 h-12 rounded-full ${isLoadingLocation ? 'bg-gray-400' : 'bg-[#007AFF]'} shadow-sm`}
-            >
-                <FontAwesome6 name="location-dot" size={20} color="white" />
-            </TouchableOpacity>
-            <TextInput
-                className="flex-1 text-black text-2xl font-JakartaMedium ml-3"
-                placeholder="Add your location..."
-                placeholderTextColor="#666"
-                value={location}
-                onChangeText={setLocation}
-            />
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+      <View className="flex-1 bg-general-300">
+        <View className="flex flex-row justify-between items-center bg-white px-4 h-12">
+          <View className="flex-row items-center mr-4">
+            <BackButton onPress={() => router.replace({pathname: "(root)/camera", params: { path: "/(root)/update-status", returnPath: "/(root)/(tabs)/profile", savePhoto: "false" }})} />
+          </View>
+          <SmallProfilePhoto />
         </View>
-          <View className="bg-white border-2 border-black rounded-2xl h-48 p-4">
+        <View className="flex-1 mx-4 mt-4">
+          <View className="flex-row items-center justify-between bg-white border-2 border-black rounded-2xl p-2 mb-4">
+              <TouchableOpacity
+                  onPress={askLocation}
+                  disabled={isLoadingLocation}
+                  className={`flex-row items-center justify-center w-12 h-12 rounded-full ${isLoadingLocation ? 'bg-gray-400' : 'bg-[#007AFF]'} shadow-sm`}
+              >
+                  <FontAwesome6 name="location-dot" size={20} color="white" />
+              </TouchableOpacity>
               <TextInput
-                  ref={inputRef}
-                  className="text-black text-xl font-JakartaMedium"
-                  placeholder={`Give an update on your day...`}
-                  multiline
-                  value={caption}
-                  onChangeText={setCaption}
+                  className="flex-1 text-black text-2xl font-JakartaMedium ml-3"
+                  placeholder="Add your location..."
+                  placeholderTextColor="#666"
+                  value={location}
+                  autoCorrect={true}
+                  autoCapitalize="sentences"
+                  onChangeText={setLocation}
               />
           </View>
-        <NiceButton
-            title={isPosting ? "Posting..." : "Confirm Update"}
-            onPress={OnConfirm}
-            className="mt-6"
-            bgVariant={isPosting ? "secondary" : "success"}
-        />
+            <View className="bg-white border-2 border-black rounded-2xl h-48 p-4">
+                <TextInput
+                    ref={inputRef}
+                    className="text-black text-xl font-JakartaMedium"
+                    placeholder={`Give an update on your day...`}
+                    multiline
+                    value={caption}
+                    autoCorrect={true}
+                    autoCapitalize="sentences"
+                    onChangeText={setCaption}
+                />
+            </View>
+          <NiceButton
+              title={isPosting ? "Posting..." : "Confirm Update"}
+              onPress={OnConfirm}
+              className="mt-6"
+              bgVariant={isPosting ? "secondary" : "success"}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

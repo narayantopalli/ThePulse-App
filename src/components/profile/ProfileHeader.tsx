@@ -60,10 +60,10 @@ const ProfileHeader = ({
         {isOwnProfile && (
           <TouchableOpacity 
             onPress={() => router.push('/(root)/my-posts')}
-            className="mt-4 bg-emerald-500 px-2 py-2 rounded-lg active:bg-emerald-500 flex-row items-center justify-center mr-20"
+            className="mt-4 bg-emerald-500 px-2 py-2 rounded-lg active:bg-emerald-500 flex-row items-center self-start"
           >
             <MaterialCommunityIcons name="post-outline" size={20} color="black" />
-            <Text className="text-black text-m font-JakartaBold text-center ml-2">
+            <Text className="text-black text-m font-JakartaBold text-center ml-1">
               View My Posts
             </Text>
           </TouchableOpacity>

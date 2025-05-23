@@ -12,5 +12,5 @@ const Layout = () => {
     </Stack>
   );
 }
-export default Layout;
 
+export default Layout;
