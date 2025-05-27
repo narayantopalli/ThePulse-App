@@ -17,7 +17,12 @@ import { requestForegroundPermissionsAsync } from "expo-location";
 import { watchPositionAsync } from "expo-location";
 import { Accuracy } from "expo-location";
 import { SessionContextType, UserMetadata } from "@/types/type";
-import { resetFeed } from "@/utils/nextFeed";
+import * as Linking from "expo-linking";
+import { loadNotifications } from "@/utils/getNotifications";
+import { loadGroupRequestsFromDatabase, loadGroupRequestsFromLocalStorage, loadMyGroupsFromDatabase } from "@/utils/loadGroups";
+import { loadMyGroupsFromLocalStorage } from "@/utils/loadGroups";
+import { getLocationString } from "@/hooks/getLocationString";
+import { loadActivityFromDatabase, reportActivity } from "@/utils/getActivity";
 
 const BUCKET           = "images";   // storage bucket
 const STORAGE_KEY      = "LOCAL_AVATAR_PATH";
@@ -40,6 +45,18 @@ const SessionContext = createContext<SessionContextType>({
   setBlockedPosts: () => {},
   myPosts: [],
   setMyPosts: () => {},
+  initialURL: null,
+  notifications: [],
+  setNotifications: () => {},
+  myGroups: [],
+  setMyGroups: () => {},
+  channel: "",
+  setChannel: () => {},
+  forceAnonymous: false,
+  setForceAnonymous: () => {},
+  groupRequests: [],
+  setGroupRequests: () => {},
+  locationString: "",
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -59,6 +76,47 @@ export const SessionProvider = ({ children }: Props) => {
   const [searchRadius, setSearchRadius] = useState<number>(4828);
   const [blockedPosts, setBlockedPosts] = useState<string[]>([]);
   const [myPosts, setMyPosts] = useState<any[]>([]);
+  const [initialURL, setInitialURL] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [myGroups, setMyGroups] = useState<any[]>([]);
+  const [groupRequests, setGroupRequests] = useState<any[]>([]);
+  const [channel, setChannel] = useState<string>('00000000-0000-0000-0000-000000000000');
+  const [forceAnonymous, setForceAnonymous] = useState<boolean>(false);
+  const [locationString, setLocationString] = useState<string>("Location not available");
+
+  useEffect(() => {
+    AsyncStorage.getItem('channel').then((channel) => {
+      if (channel) setChannel(channel);
+    });
+    AsyncStorage.getItem('forceAnonymous').then((forceAnonymous) => {
+      if (forceAnonymous) setForceAnonymous(forceAnonymous === 'true');
+    });
+  }, []);
+
+  useEffect(() => {
+    const fetchLocationString = async () => {
+      if (location) {
+        const locationStr = await getLocationString(location);
+        setLocationString(locationStr);
+      }
+    };
+    fetchLocationString();
+  }, [location]);
+
+  useEffect(() => {
+    if (userMetadata?.id && location) {
+      reportActivity(location, userMetadata.id);
+    }
+  }, [userMetadata?.id, location]);
+
+  useEffect(() => {
+    if (userMetadata?.id) {
+      loadMyGroupsFromLocalStorage(userMetadata.id, setMyGroups);
+      loadMyGroupsFromDatabase(userMetadata.id, setMyGroups);
+      loadGroupRequestsFromLocalStorage(userMetadata.id, setGroupRequests);
+      loadGroupRequestsFromDatabase(userMetadata.id, setGroupRequests);
+    }
+  }, [userMetadata?.id]);
 
   useEffect(() => {
     AsyncStorage.getItem('searchRadius').then((radius) => {
@@ -71,6 +129,14 @@ export const SessionProvider = ({ children }: Props) => {
       if (data) setBlockedPosts(data.map((post) => post.post_id));
       AsyncStorage.setItem('blockedPosts', JSON.stringify(blockedPosts));
     });
+  }, []);
+
+  useEffect(() => {
+    const getInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      setInitialURL(url);
+    };
+    getInitialURL();
   }, []);
 
   useEffect(() => {
@@ -114,19 +180,13 @@ export const SessionProvider = ({ children }: Props) => {
 
   const getFeedFromLocalStorage = async (): Promise<any[]> => {
     if (userMetadata?.id) {
-      const storedFeed = await AsyncStorage.getItem(`feed_${userMetadata.id}`);
+      const storedFeed = await AsyncStorage.getItem(`feed_${channel}_${userMetadata.id}`);
       if (storedFeed) {
         return JSON.parse(storedFeed);
       }
     }
     return [];
   }
-
-  useEffect(() => {
-    if (location) {
-      getFeed(location[0], location[1]);
-    }
-  }, [])
 
   useEffect(() => {
     let locationSubscription: Location.LocationSubscription;
@@ -276,13 +336,17 @@ export const SessionProvider = ({ children }: Props) => {
     if (profileErr) return console.error(profileErr);
   };
 
-  const getFeed = async (latitude: number, longitude: number) => {
-    const newFeed = await resetFeed(session, latitude, longitude, searchRadius, blockedPosts, 10);
-    if (newFeed.length !== 0) {
-      setFeed(newFeed);
-      AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+  useEffect(() => {
+    if (forceAnonymous) {
+      setIsAnonymous(true);
     }
-  };
+  }, [forceAnonymous]);
+
+  useEffect(() => {
+    if (userMetadata?.id) {
+      loadNotifications(userMetadata, setNotifications);
+    }
+  }, [userMetadata?.id]);
 
   return (
     <SessionContext.Provider
@@ -304,6 +368,18 @@ export const SessionProvider = ({ children }: Props) => {
         setBlockedPosts,
         myPosts,
         setMyPosts,
+        initialURL,
+        notifications,
+        setNotifications,
+        myGroups,
+        setMyGroups,
+        channel,
+        setChannel,
+        forceAnonymous,
+        setForceAnonymous,
+        groupRequests,
+        setGroupRequests,
+        locationString,
       }}
     >
       {children}

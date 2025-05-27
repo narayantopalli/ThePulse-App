@@ -55,12 +55,19 @@ const ReportButton = ({ postId }: { postId: string }) => {
               <View className="mb-4">
                 <Text className="text-gray-600 mb-2">Reason:</Text>
                 <TextInput
-                  className="border border-gray-300 rounded-lg p-2 font-JakartaMedium"
+                  className="border border-gray-300 rounded-lg p-2"
                   placeholder="Enter reason for report"
                   value={reportReason}
                   onChangeText={setReportReason}
                   multiline
                   numberOfLines={3}
+                  style={{
+                    fontFamily: "font-JakartaRegular",
+                    fontSize: 18,
+                    color: "#333",
+                    paddingVertical: 8,
+                    textAlignVertical: 'center'
+                  }}
                 />
               </View>
 

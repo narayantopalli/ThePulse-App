@@ -13,7 +13,7 @@ async function getResponse(prompt: string) {
     throw new Error('Gemini API key is not configured');
   }
 
-  const systemPrompt = "only give me an array of 4byte RGB decimal integers in order for these words, absolutely no other text";
+  const systemPrompt = "only give me an array of 4byte RGB decimal integers in order for these words, be creative don't choose white or black, absolutely no other text";
   const fullPrompt = `${systemPrompt}\n\nWords: ${prompt}`;
 
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {

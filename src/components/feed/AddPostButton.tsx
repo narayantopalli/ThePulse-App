@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useRef } from "react";
 
-const AddPostButton = () => {
+const AddPostButton = ({ sizeMultiplier = 1 }: { sizeMultiplier?: number }) => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -51,22 +51,16 @@ const AddPostButton = () => {
       <TouchableOpacity
         onPress={() => {
           router.push({
-            pathname: "/(root)/(edit)/create-post",
+            pathname: "/(root)/(social)/create-post",
           });
         }}
-        className="bg-general-900 w-16 h-16 rounded-full justify-center items-center shadow-lg"
+        className="bg-[#FFFC00] rounded-full justify-center items-center"
         style={{
-          shadowColor: '#000',
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.25,
-          shadowRadius: 3.84,
-          elevation: 5,
+          width: 42 * sizeMultiplier,
+          height: 42 * sizeMultiplier,
         }}
       >
-        <MaterialIcons name="add" size={32} color="black" />
+        <MaterialIcons name="add" size={32 * sizeMultiplier} color="#000000" />
       </TouchableOpacity>
     </Animated.View>
   );

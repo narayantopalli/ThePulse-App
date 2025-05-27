@@ -8,6 +8,7 @@ import Status from "@/components/status";
 import ChangeStatus from "@/components/buttons/changeStatus";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileBio from "@/components/profile/ProfileBio";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function Profile() {
   const { userMetadata, loading, updateProfilePhoto, profilePhotoURL } = useSession();
@@ -30,7 +31,6 @@ export default function Profile() {
   }, [params?.newPhotoUri]);
 
   const pickImage = async () => {
-
     Keyboard.dismiss();
     
     const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
@@ -72,12 +72,11 @@ export default function Profile() {
     }
   };
 
-
   if (loading) return null;
 
   return (
-    <View className="flex-1 bg-general-300">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <View className="flex-1 bg-gradient-to-b from-general-300 to-general-200">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
         <ProfileHeader 
           onPhotoPress={pickImage}
           userMetadata={userMetadata}
@@ -86,16 +85,22 @@ export default function Profile() {
         />
         <ProfileBio isOwnProfile={true} />
         
-        <View className="mt-4 mx-4 mb-32">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-black text-2xl font-JakartaMedium">Current Status</Text>
-            <View className="flex-1 items-end mr-4">
-              <ChangeStatus />
+        {/* Status Section */}
+        <View className="px-4 py-4">
+          <View className="flex-row items-center justify-between mb-2">
+            <View className="flex-row items-center">
+              <View className="bg-white/80 p-1.5 rounded-full">
+                <MaterialCommunityIcons name="heart-pulse" size={22} color="#000" />
+              </View>
+              <Text className="text-black text-lg font-JakartaBold ml-2">Current Status</Text>
             </View>
+            <ChangeStatus />
           </View>
-          <Status 
-            user_id={userMetadata?.id || ""} 
-          />
+          <View className="bg-white/90 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-sm border border-gray-100">
+            <Status 
+              user_id={userMetadata?.id || ""} 
+            />
+          </View>
         </View>
       </ScrollView>
     </View>

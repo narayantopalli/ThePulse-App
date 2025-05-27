@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/utils/supabase';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
-import { getLocationString } from '@/hooks/getLocationString';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { PostUploaderProps } from '@/types/type';
+import { useSession } from '@/contexts/SessionContext';
 
 const PostUploader = ({
   postPhoto,
@@ -19,9 +19,20 @@ const PostUploader = ({
   userMetadata,
   setUserMetadata,
   onError,
-  postAnonymous
+  postAnonymous,
+  channel
 }: PostUploaderProps) => {
+    const { myGroups, locationString } = useSession();
     const [isPosting, setIsPosting] = useState(false);
+    const [channelString, setChannelString] = useState(channel);
+
+    useEffect(() => {
+        const fetchChannelString = async () => {
+            const channelString = myGroups.find(group => group.id === channel)?.name;
+            setChannelString(channelString);
+        };
+        fetchChannelString();
+    }, [myGroups, channel]);
     
     const uploadPost = async () => {
         try {
@@ -60,8 +71,6 @@ const PostUploader = ({
                 });
             }
 
-            const locationString = location ? await getLocationString(location) : "";
-
             // Create post in database
             const postResult = await supabase.from("posts").insert({
                 user_id: userMetadata?.id,
@@ -79,7 +88,8 @@ const PostUploader = ({
                 anonymous: postAnonymous,
                 latitude: location?.[0],
                 longitude: location?.[1],
-                visibility_radius: visibilityDistance
+                visibility_radius: visibilityDistance,
+                channel: channel
             }).select();
 
             if (uploadResult?.error) throw uploadResult.error;
@@ -122,7 +132,7 @@ const PostUploader = ({
                     isPosting ? 'text-gray-400' : 'text-white'
                 }`}
             >
-                {isPosting ? "Posting..." : "Share Post"}
+                {isPosting ? "Posting..." : channelString ? `Share Post to ${channelString}` : "Share Post"}
             </Text>
         </TouchableOpacity>
     );

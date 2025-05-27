@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { enableFreeze } from 'react-native-screens';
 import { SessionProvider } from "@/contexts/SessionContext";
+import { SearchProvider } from "@/contexts/SearchContext";
 import "../../global.css";
 
 enableFreeze(true);
@@ -35,12 +36,14 @@ const Layout = () => {
 
   return (
     <SessionProvider>
-      <Stack screenOptions={{ animation: "fade", freezeOnBlur: true }}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(root)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <SearchProvider>
+        <Stack screenOptions={{ animation: "fade", freezeOnBlur: true }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(root)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </SearchProvider>
     </SessionProvider>
   );
 }

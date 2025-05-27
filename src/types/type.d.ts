@@ -4,7 +4,7 @@ export interface User {
   firstname: string;
   lastname: string;
   birthday: string;
-  gender: string;
+  pronouns: string;
   bio: string;
   avatar_url: string;
   last_posted: string;
@@ -15,11 +15,13 @@ export interface UserMetadata {
   firstname: string;
   lastname: string;
   birthday: string;
-  gender: string;
+  pronouns: string;
   bio: string;
   avatar_url: string;
   last_posted: string;
   words_left: number;
+  current_score: number;
+  current_ranking: number;
 }
 
 // Post Types
@@ -66,22 +68,8 @@ export interface ButtonProps {
   textVariant?: 'primary' | 'secondary' | 'danger' | 'success';
   className?: string;
   disabled?: boolean;
-}
-
-export interface InputFieldProps {
-  label: string;
-  value: string;
-  icon: any;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-  secureTextEntry?: boolean;
-  ref?: any;
-  labelStyle?: string;
-  containerStyle?: string;
-  inputStyle?: string;
-  iconStyle?: string;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  className?: string;
+  IconLeft?: () => React.ReactNode;
+  IconRight?: () => React.ReactNode;
 }
 
 export interface ErrorMessageProps {
@@ -104,6 +92,7 @@ export interface PostUploaderProps {
   setUserMetadata: (metadata: any) => void;
   onError: (message: string) => void;
   postAnonymous: boolean;
+  channel: string;
 }
 
 export interface TextPostProps {
@@ -136,6 +125,7 @@ export interface VisibilitySelectorProps {
   onSliderValueChange: (value: number) => void;
   postAnonymous: boolean;
   setPostAnonymous: (anonymous: boolean) => void;
+  forceAnonymous?: boolean;
 }
 
 // Feed Component Props
@@ -269,6 +259,18 @@ interface SessionContextType {
   setBlockedPosts: (value: string[]) => void;
   myPosts: any[];
   setMyPosts: (value: any[]) => void;
+  initialURL: string | null;
+  notifications: any[];
+  setNotifications: (value: any[]) => void;
+  myGroups: any[];
+  setMyGroups: (value: any[]) => void;
+  channel: string;
+  setChannel: (value: string) => void;
+  forceAnonymous: boolean;
+  setForceAnonymous: (value: boolean) => void;
+  groupRequests: any[];
+  setGroupRequests: (value: any[]) => void;
+  locationString: string;
 }
 
 // Friendship Types
@@ -294,4 +296,68 @@ export interface SharedHeaderTabsProps {
   whichIcon?: number;
   showLocation?: boolean;
   isDarkMode?: boolean;
+}
+
+// Group Types
+export interface Group {
+  id: string;
+  name: string;
+  size: number;
+  created_at: string;
+  anonymous: boolean;
+  private: boolean;
+}
+
+export interface GroupMember {
+  id: string;
+  firstname: string;
+  lastname: string;
+  avatar_url: string;
+}
+
+export interface GroupItemProps {
+  item: Group;
+  isMember: boolean;
+  isRequestingJoin: boolean;
+  onJoin: (groupId: string) => void;
+  onLeave: (groupId: string, isRequestingJoin: boolean) => void;
+  onShowMembers: (group: Group) => void;
+  numRequests: number;
+  setNumRequests: (value: number | ((prev: number) => number)) => void;
+}
+
+export interface SearchResultsProps {
+  groups: Group[];
+  onEndReached: () => void;
+  onRefresh: () => void;
+  refreshing: boolean;
+  setRefreshing: (refreshing: boolean) => void;
+  groupRequests: Group[];
+  setGroupRequests: (value: Group[]) => void;
+}
+
+export interface CreateGroupModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onGroupCreated: (newGroup: any) => void;
+  numRequests?: number;
+}
+
+export interface GroupDetailsModalProps {
+  visible: boolean;
+  onClose: () => void;
+  group: Group | null;
+  numRequests?: number;
+  setNumRequests: (value: number) => void;
+}
+
+export interface GroupMember {
+  id: string;
+  firstname: string;
+  lastname: string;
+  avatar_url: string;
+}
+
+export interface GroupListHeaderProps {
+  onCreatePress: () => void;
 }

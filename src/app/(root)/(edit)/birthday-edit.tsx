@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity, Platform } from "react-native";
 import { router } from "expo-router";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
-import NiceButton from "@/components/buttons/niceButton";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BackButton from "@/components/buttons/backButton";
+import { Ionicons } from '@expo/vector-icons';
 
 const BirthdayEdit = () => {
   const { userMetadata, setUserMetadata } = useSession();
   const [birthday, setBirthday] = useState<Date>(new Date());
   const [error, setError] = useState("");
+  const [showPicker, setShowPicker] = useState(Platform.OS === 'ios');
 
   useEffect(() => {
     // Initialize with user's current birthday if available
@@ -29,6 +32,9 @@ const BirthdayEdit = () => {
     if (age > 120) {
       return "Please enter a realistic birthday";
     }
+    if (age < 12) {
+      return "You must be at least 12 years old to use this app";
+    }
     return "";
   };
 
@@ -39,7 +45,19 @@ const BirthdayEdit = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const formatDateToDisplay = (date: Date): string => {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const onDateChange = (event: any, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+    }
+    
     if (selectedDate) {
       const validationError = validateBirthday(selectedDate);
       if (validationError) {
@@ -82,35 +100,56 @@ const BirthdayEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-300">
-      <View className="flex-1 mx-4 mt-4">
-        <View className="bg-white border-2 border-black rounded-2xl h-16 p-4 justify-center">
-          <Text 
-            className="text-black text-xl font-JakartaMedium"
-          >
-            {formatDateToYYYYMMDD(birthday)}
-          </Text>
+    <SafeAreaView edges={["top"]} className="flex-1 bg-gray-50">
+      <View className="flex-1">
+        <View className="flex flex-row items-center bg-white px-4 h-14 shadow-sm">
+          <BackButton onPress={() => router.replace("/settings")} />
+          <Text className="text-xl font-JakartaBold ml-2">Edit Birthday</Text>
         </View>
-        
-        <DateTimePicker
-          value={birthday}
-          mode="date"
-          display="default"
-          onChange={onDateChange}
-          maximumDate={new Date()}
-        />
 
-        <NiceButton
-          title="Confirm Birthday"
-          onPress={OnConfirm}
-          className="mt-6"
-          bgVariant="success"
-        />
-        {error ? (
-          <Text className="text-red-500 mt-2 text-sm">{error}</Text>
-        ) : null}
+        <View className="flex-1 px-4 pt-6">
+          <Text className="text-gray-500 font-JakartaMedium mb-4 text-sm">YOUR BIRTHDAY</Text>
+          
+          <TouchableOpacity
+            onPress={() => setShowPicker(true)}
+            className="bg-white rounded-xl p-4 shadow-sm"
+          >
+            <Text className="text-gray-500 text-sm font-JakartaMedium mb-1">Birthday</Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-gray-800 text-lg font-JakartaMedium">
+                {formatDateToDisplay(birthday)}
+              </Text>
+              <Ionicons name="calendar-outline" size={24} color="#4B5563" />
+            </View>
+          </TouchableOpacity>
+
+          {showPicker && (
+            <DateTimePicker
+              value={birthday}
+              mode="date"
+              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+              onChange={onDateChange}
+              maximumDate={new Date()}
+              style={Platform.OS === 'ios' ? { height: 200 } : undefined}
+            />
+          )}
+
+          {error ? (
+            <Text className="text-red-500 mt-4 text-sm font-JakartaMedium">{error}</Text>
+          ) : null}
+
+          <View className="mt-8">
+            <TouchableOpacity
+              onPress={OnConfirm}
+              className="bg-blue-500 p-4 rounded-xl shadow-sm flex-row items-center justify-center"
+            >
+              <Ionicons name="checkmark" size={24} color="white" className="mr-2" />
+              <Text className="text-white text-lg font-JakartaMedium">Save Changes</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

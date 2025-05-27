@@ -1,16 +1,29 @@
 import { images } from "@/constants";
 import { router } from "expo-router";
-import { Text, View, Image, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { Text, View, Image, StyleSheet, TextInput, TouchableOpacity} from "react-native";
+import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import BackButton from "@/components/buttons/backButton";
+import * as Linking from "expo-linking";
+import { useSession } from "@/contexts/SessionContext";
 
 const ResetPassword = () => {
+  const { initialURL } = useSession();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState("");
+
+  useEffect(() => {
+    if (initialURL) {
+      const { queryParams } = Linking.parse(initialURL);
+      if (queryParams?.code) {
+        setCode(queryParams.code as string);
+      }
+    }
+  }, [initialURL]);
 
   const handleResetPassword = async () => {
     if (!password || !confirmPassword) {
@@ -33,17 +46,27 @@ const ResetPassword = () => {
     setSuccessMessage("");
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+      
+      if (!session || sessionError) {
+        setErrorMessage("No active session found. Please try resetting your password again.");
+        setTimeout(() => {
+          router.replace("/(auth)/forgot-password");
+        }, 2000);
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
         password: password
       });
 
-      if (error) {
-        setErrorMessage(error.message);
+      if (updateError) {
+        setErrorMessage(updateError.message);
       } else {
         setSuccessMessage("Password has been reset successfully");
-        // Redirect to sign in after 2 seconds
+        // Redirect to home after 2 seconds
         setTimeout(() => {
-          router.replace("/(auth)/sign-in");
+          router.replace("/(tabs)/home");
         }, 2000);
       }
     } catch (error: any) {
@@ -62,7 +85,7 @@ const ResetPassword = () => {
           style={styles.headerImage}
         />
         <View className="absolute top-12 left-4">
-          <BackButton onPress={() => router.back()} />
+          <BackButton onPress={() => router.replace("/(auth)/forgot-password")} />
         </View>
         <View className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
           <Text className="text-3xl text-black font-JakartaSemiBold">
@@ -97,26 +120,40 @@ const ResetPassword = () => {
               <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium">New Password</Text>
               <View className="relative">
                 <TextInput
-                  className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                  className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                   placeholder="Enter new password"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                   placeholderTextColor="#9CA3AF"
+                  style={{
+                    fontFamily: "font-JakartaRegular",
+                    fontSize: 18,
+                    color: "#333",
+                    paddingVertical: 8,
+                    textAlignVertical: 'center'
+                  }}
                 />
               </View>
             </View>
 
             <View>
-              <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium">Confirm Password</Text>
+              <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium mt-2">Confirm Password</Text>
               <View className="relative">
                 <TextInput
-                  className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                  className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                   placeholder="Confirm new password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
                   placeholderTextColor="#9CA3AF"
+                  style={{
+                    fontFamily: "font-JakartaRegular",
+                    fontSize: 18,
+                    color: "#333",
+                    paddingVertical: 8,
+                    textAlignVertical: 'center'
+                  }}
                 />
               </View>
             </View>

@@ -9,6 +9,7 @@ import { StatusProps } from "@/types/type";
 import { useSession } from "@/contexts/SessionContext";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { formatTimeAgo } from '@/hooks/formatTimeAgo';
+import { useRouter } from 'expo-router';
 
 const Status = ({ user_id }: StatusProps) => {
     const [status, setStatus] = useState<any>();
@@ -16,6 +17,7 @@ const Status = ({ user_id }: StatusProps) => {
     const [liked, setLiked] = useState<boolean>(false);
     const { userMetadata, isAnonymous } = useSession();
     const isOwnProfile = user_id === userMetadata?.id;
+    const router = useRouter();
     
     const fetchLikes = async () => {
       if (!status?.[0]?.id) return;
@@ -117,7 +119,7 @@ const Status = ({ user_id }: StatusProps) => {
       } else {
         const { error } = await supabase
           .from('status_likes')
-          .insert({ status_id: status[0].id, user_id: userMetadata.id, anonymous: isAnonymous });
+          .insert({ status_id: status[0].id, user_id: userMetadata.id });
 
         if (error) {
           console.error('Error liking status:', error);
@@ -132,7 +134,7 @@ const Status = ({ user_id }: StatusProps) => {
             user_id: user_id,
             sender_id: userMetadata?.id,
             data: {
-              anonymous: isAnonymous,
+              anonymous: false,
               type: 'status_like',
             }
           });
@@ -146,11 +148,11 @@ const Status = ({ user_id }: StatusProps) => {
     };
 
     return (
-        <View className="bg-white border-2 border-black rounded-2xl p-4 mt-2">
+        <View className="bg-white border-2 border-black rounded-2xl p-3 mt-1">
         {status && status.length > 0 ? (
             status.map((status: any) => (
               <React.Fragment key={status.id}>
-              <View className="flex-row items-center mb-2">
+              <View className="flex-row items-center mb-1">
                   <View className="flex-row items-center">
                     <Text className="text-gray-500 text-lg">
                       {formatTimeAgo(new Date(status.created_at))}
@@ -169,12 +171,7 @@ const Status = ({ user_id }: StatusProps) => {
                   resizeMode="cover"
                 />
               </View>
-              <View className="bg-gray-50 rounded-2xl p-4">
-                <Text className="text-black text-xl font-JakartaMedium">
-                  {status.caption}
-                </Text>
-              </View>
-              <View className="flex-row items-center mt-4 justify-end">
+              <View className="flex-row items-center justify-between mb-2">
                 {isOwnProfile ? (
                   <View className="flex-row items-center">
                     <FontAwesome6 name="heart" size={20} color="#ef4444" solid />
@@ -193,15 +190,41 @@ const Status = ({ user_id }: StatusProps) => {
                       color={liked ? "#ef4444" : "#6b7280"}
                       solid={liked}
                     />
+                    <Text className="ml-2 text-gray-600 font-JakartaMedium">
+                      {likes} {likes === 1 ? 'like' : 'likes'}
+                    </Text>
                   </TouchableOpacity>
                 )}
+              </View>
+              <View className="bg-gray-50 rounded-2xl p-4">
+                <Text className="text-black text-xl font-JakartaMedium">
+                  {status.caption}
+                </Text>
               </View>
               </React.Fragment>
             ))
         ) : (
-            <Text className="text-black text-xl font-JakartaMedium">
-            No current status.
-            </Text>
+            isOwnProfile ? (
+              <TouchableOpacity 
+                onPress={() => router.replace({pathname: "/(root)/camera", params: { path: "/(root)/(social)/update-status", returnPath: "/(root)/(tabs)/profile", savePhoto: "false" }})}
+                className="flex items-center justify-center py-8"
+              >
+                <FontAwesome6 name="circle-exclamation" size={40} color="#6b7280" />
+                <Text className="text-gray-500 text-xl font-JakartaMedium mt-3">
+                  No current status
+                </Text>
+                <Text className="text-gray-400 text-sm font-JakartaMedium mt-2">
+                  Tap to update your status
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <View className="flex items-center justify-center py-8">
+                <FontAwesome6 name="circle-exclamation" size={40} color="#6b7280" />
+                <Text className="text-gray-500 text-xl font-JakartaMedium mt-3">
+                  No current status
+                </Text>
+              </View>
+            )
         )}
         </View>
     );

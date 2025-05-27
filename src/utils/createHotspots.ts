@@ -23,7 +23,7 @@ const calculateDistance = (lat1: number | null, lon1: number | null, lat2: numbe
 const createHotspots = (activities: any[]): Hotspot[] => {
     const hotspots: Hotspot[] = [];
     const CLUSTER_RADIUS = 300; // meters
-    const MIN_ACTIVITIES = 3; // minimum activities to form a hotspot
+    const MIN_ACTIVITIES = 5; // minimum activities to form a hotspot
 
     activities.forEach(activity => {
 

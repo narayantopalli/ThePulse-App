@@ -6,9 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { formatTimeAgo } from "@/hooks/formatTimeAgo";
+import { useSession } from "@/contexts/SessionContext";
 
 const MyPostsFeedItem = ({ post, onDelete }: { post: any, onDelete?: () => void }) => {
   const [likes, setLikes] = useState(0);
+  const { myGroups } = useSession();
   
   if (!post) {
     return null;
@@ -82,6 +84,12 @@ const MyPostsFeedItem = ({ post, onDelete }: { post: any, onDelete?: () => void 
     }
   };
 
+  const getChannelName = () => {
+    if (post.channel === '00000000-0000-0000-0000-000000000000') return 'Main Feed';
+    const channel = myGroups.find(group => group.id === post.channel);
+    return channel?.name || 'Unknown';
+  };
+
   return (
     <View className="mt-3 mx-4">
       <View className="rounded-3xl p-5 shadow-lg border-2 border-gray-400">
@@ -97,6 +105,9 @@ const MyPostsFeedItem = ({ post, onDelete }: { post: any, onDelete?: () => void 
                     •  {post.location_string}
                   </Text>
                 )}
+                <Text className="text-gray-600 text-sm ml-2 font-medium">
+                  •  {getChannelName()}
+                </Text>
               </View>
             </View>
             <View className="flex-row items-center">

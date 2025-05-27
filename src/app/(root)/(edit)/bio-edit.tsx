@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import NiceButton from "@/components/buttons/niceButton";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
-import { View, TextInput } from "react-native";
+import { View, TextInput, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BackButton from "@/components/buttons/backButton";
+import { Ionicons } from '@expo/vector-icons';
 
 const BioEdit = () => {
   const { userMetadata, setUserMetadata } = useSession();
@@ -11,7 +13,6 @@ const BioEdit = () => {
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    // Focus the input when component mounts
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
@@ -34,30 +35,48 @@ const BioEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-300">
-      <View className="flex-1 mx-4 mt-4">
-          <View className="bg-white border-2 border-black rounded-2xl h-48 p-4">
-              <TextInput
-                  ref={inputRef}
-                  className="text-black text-xl font-JakartaMedium"
-                  placeholder="Write something about yourself..."
-                  multiline
-                  value={bio}
-                  autoCorrect={true}
-                  autoCapitalize="sentences"
-                  onChangeText={(e) => {
-                      setBio(e);
-                  }}
-              />
+    <SafeAreaView edges={["top"]} className="flex-1 bg-gray-50">
+      <View className="flex-1">
+        <View className="flex flex-row items-center bg-white px-4 h-14 shadow-sm">
+          <BackButton onPress={() => router.replace("/(root)/(tabs)/profile")} />
+          <Text className="text-xl font-JakartaBold ml-2">Edit Bio</Text>
+        </View>
+
+        <View className="flex-1 px-4 pt-6">
+          <Text className="text-gray-500 font-JakartaMedium mb-4 text-sm">YOUR BIO</Text>
+          
+          <View className="bg-white rounded-xl p-4 shadow-sm">
+            <Text className="text-gray-500 text-sm font-JakartaMedium mb-1">About Me</Text>
+            <TextInput
+              ref={inputRef}
+              placeholder="Write something about yourself..."
+              multiline
+              value={bio}
+              autoCorrect={true}
+              autoCapitalize="sentences"
+              onChangeText={setBio}
+              style={{
+                fontFamily: "font-JakartaRegular",
+                fontSize: 18,
+                color: "#333",
+                paddingVertical: 8,
+                textAlignVertical: 'center'
+              }}
+            />
           </View>
-      <NiceButton
-          title="Confirm Bio"
-          onPress={OnConfirm}
-          className="mt-6"
-          bgVariant="success"
-      />
+
+          <View className="mt-8">
+            <TouchableOpacity
+              onPress={OnConfirm}
+              className="bg-blue-500 p-4 rounded-xl shadow-sm flex-row items-center justify-center"
+            >
+              <Ionicons name="checkmark" size={24} color="white" className="mr-2" />
+              <Text className="text-white text-lg font-JakartaMedium">Save Changes</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

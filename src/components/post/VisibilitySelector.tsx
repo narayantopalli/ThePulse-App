@@ -7,7 +7,8 @@ const VisibilitySelector = ({
   sliderValue, 
   onSliderValueChange,
   postAnonymous,
-  setPostAnonymous
+  setPostAnonymous,
+  forceAnonymous = false
 }: VisibilitySelectorProps) => {
   const getVisibilityText = (value: number) => {
     if (value >= 16093) return "Maximum"; // 16093 meters = 10 miles
@@ -16,6 +17,13 @@ const VisibilitySelector = ({
     }
     return `${100*Math.round(value * 0.0328084)}ft`; // Convert meters to feet
   };
+
+  // If forceAnonymous is true, ensure postAnonymous is true
+  React.useEffect(() => {
+    if (forceAnonymous && !postAnonymous) {
+      setPostAnonymous(true);
+    }
+  }, [forceAnonymous, postAnonymous, setPostAnonymous]);
 
   return (
     <View className="mt-2 mb-4 bg-white border-2 border-black rounded-2xl p-4">
@@ -59,10 +67,11 @@ const VisibilitySelector = ({
       <View className="flex-row items-center justify-between mt-4 pt-4 border-t border-gray-200">
         <Text className="text-gray-600">Post Anonymously</Text>
         <Switch
-          value={postAnonymous}
-          onValueChange={setPostAnonymous}
+          value={forceAnonymous ? true : postAnonymous}
+          onValueChange={forceAnonymous ? undefined : setPostAnonymous}
           trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
-          thumbColor={postAnonymous ? '#ffffff' : '#f4f3f4'}
+          thumbColor={forceAnonymous || postAnonymous ? '#ffffff' : '#f4f3f4'}
+          disabled={forceAnonymous}
         />
       </View>
     </View>

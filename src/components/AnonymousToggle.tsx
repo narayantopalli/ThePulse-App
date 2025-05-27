@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import { Switch } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
+import { useSession } from "@/contexts/SessionContext";
 
 interface AnonymousToggleProps {
   isAnonymous: boolean;
@@ -8,19 +9,25 @@ interface AnonymousToggleProps {
 }
 
 const AnonymousToggle = ({ isAnonymous, setIsAnonymous }: AnonymousToggleProps) => {
+  const { forceAnonymous } = useSession();
+  
+  // If forceAnonymous is true, we should always be anonymous
+  const effectiveIsAnonymous = forceAnonymous ? true : isAnonymous;
+
   return (
-    <View className="absolute top-2 right-4 bg-general-800 rounded-full px-3 py-2 flex-row items-center">
+    <View className="flex-row items-center">
       <MaterialIcons 
-        name={isAnonymous ? "visibility" : "visibility-off"} 
-        size={24} 
-        color={isAnonymous ? "#2563eb" : "#f4f3f4"} 
-        style={{ marginRight: 8 }}
+        name={effectiveIsAnonymous ? "visibility" : "visibility-off"} 
+        size={22} 
+        color={effectiveIsAnonymous ? "#0095F6" : "#262626"} 
+        style={{ marginRight: 2 }}
       />
       <Switch
-        value={isAnonymous}
-        onValueChange={setIsAnonymous}
-        trackColor={{ false: '#767577', true: '#2563eb' }}
-        thumbColor={isAnonymous ? '#f4f3f4' : '#f4f3f4'}
+        value={effectiveIsAnonymous}
+        onValueChange={forceAnonymous ? undefined : setIsAnonymous}
+        trackColor={{ false: '#DBDBDB', true: '#0095F6' }}
+        thumbColor={effectiveIsAnonymous ? '#FFFFFF' : '#FFFFFF'}
+        style={{ transform: [{ scale: 0.8 }] }}
       />
     </View>
   );

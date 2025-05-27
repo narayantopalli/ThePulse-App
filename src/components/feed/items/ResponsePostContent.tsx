@@ -61,7 +61,7 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
         <TextInput
           ref={el => { inputRefs.current[postId] = el }}
           onFocus={() => onFocus(postId)}
-          className="text-black text-base font-JakartaMedium min-h-[80px]"
+          className="min-h-[80px]"
           placeholder="Write your response..."
           placeholderTextColor="#9CA3AF"
           multiline
@@ -71,7 +71,13 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
             setResponse(cleanText);
           }}
           maxLength={500}
-          style={{ textAlignVertical: 'top' }}
+          style={{
+            fontFamily: "font-JakartaRegular",
+            fontSize: 18,
+            color: "#333",
+            paddingVertical: 8,
+            textAlignVertical: 'center'
+          }}
           onKeyPress={({ nativeEvent }) => {
             if (nativeEvent.key === 'Enter') {
               if (inputRefs.current[postId]) {

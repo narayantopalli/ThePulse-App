@@ -1,6 +1,6 @@
 import { TouchableOpacity, Text, View } from "react-native";
 
-const GenderOption = ({ title, onPress, isSelected }: { title: string; onPress: () => void; isSelected: boolean }) => (
+const PronounsOption = ({ title, onPress, isSelected }: { title: string; onPress: () => void; isSelected: boolean }) => (
     <View className="m-1">
         <TouchableOpacity
         onPress={onPress}
@@ -13,4 +13,4 @@ const GenderOption = ({ title, onPress, isSelected }: { title: string; onPress: 
     </View>
   );
 
-export default GenderOption;
+export default PronounsOption;

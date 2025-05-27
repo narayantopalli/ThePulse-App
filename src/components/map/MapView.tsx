@@ -60,10 +60,12 @@ const CustomMapView = ({ region, setRegion, location, hotspots }: CustomMapViewP
         pointerEvents="auto"
         onTouchStart={() => {}}
       />
-      <VisibilityRadiusButton 
-        searchRadius={searchRadius}
-        setSearchRadius={setSearchRadius}
-      />
+        <View className="absolute top-4 right-4 flex-row justify-between items-center">
+          <VisibilityRadiusButton
+            searchRadius={searchRadius}
+            setSearchRadius={setSearchRadius}
+          />
+        </View>
       <ResetLocationButton onPress={resetMapView} />
     </View>
   );

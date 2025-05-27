@@ -1,11 +1,11 @@
 import Constants from "expo-constants";
 import { getLocalImageURI } from "@/utils/getImage";
 
-const resetFeed = async (session: { access_token: string }, latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number): Promise<any[]> => {
+const resetFeed = async (session: { access_token: string }, latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number, channel: string): Promise<any[]> => {
   try {
     if (!session?.access_token) return [];
     
-      const { newFeed } = await nextFeed(session, [], latitude, longitude, searchRadius, blockedPosts, numPostsToAdd);
+      const { newFeed } = await nextFeed(session, [], latitude, longitude, searchRadius, blockedPosts, numPostsToAdd, channel);
 
       if (newFeed.length !== 0) {
         const newFeedWithUserMetadata = await Promise.all(newFeed.map(async (post: any) => ({
@@ -28,7 +28,7 @@ const resetFeed = async (session: { access_token: string }, latitude: number, lo
     }
 };
 
-const nextFeed = async (session: any, feed: any, latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number) => {
+const nextFeed = async (session: any, feed: any, latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number, channel: string) => {
   const response = await fetch(`${Constants.expoConfig?.extra?.supabaseUrl}/functions/v1/get-suggested-posts`, {
     method: 'POST',
     headers: {
@@ -41,6 +41,7 @@ const nextFeed = async (session: any, feed: any, latitude: number, longitude: nu
       searchRadius,
       blockedPosts,
       numPostsToAdd,
+      channel
     }),
   });
 

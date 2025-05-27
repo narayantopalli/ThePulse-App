@@ -32,9 +32,9 @@ export const icons = {
 export const onboarding = [
   {
     id: 1,
-    title: "Feel the campus vibe",
+    title: "Feel the vibe",
     description:
-      "See what people are up to and thinking about. Figure out the current hotspots on campus.",
+      "See what people near you are thinking about and feeling.",
     image: images.onboarding1,
     className: "mt-16 h-[400px]",
   },
@@ -42,7 +42,7 @@ export const onboarding = [
     id: 2,
     title: "Meet new friends",
     description:
-      "Find your people outside of the classroom.",
+      "Find your people. See locations of high app activity.",
     image: images.onboarding2,
     className: "mt-16 h-[400px]",
   },
@@ -50,7 +50,7 @@ export const onboarding = [
     id: 3,
     title: "Stay safe",
     description:
-      "State of the art privacy features to keep your information safe while still allowing you to engage in the community fun.",
+      "Choose to hide your identity from other users or make private groups.",
     image: images.onboarding3,
     className: "mt-16 h-[400px]",
   },

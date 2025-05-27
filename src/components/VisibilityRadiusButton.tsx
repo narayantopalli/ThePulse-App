@@ -34,16 +34,22 @@ const VisibilityRadiusButton = ({ searchRadius, setSearchRadius }: VisibilityRad
           setTempRadius(searchRadius);
           setEditSearchRadius(true);
         }}
-        className="absolute top-4 left-4 bg-purple-500 rounded-full px-4 py-2 flex-row items-center space-x-2"
+        className="bg-purple-300 rounded-full p-2.5 flex-row items-center space-x-2 shadow-sm"
       >
         <MaterialIcons 
           name="my-location" 
           size={20} 
           color="#f4f3f4"
         />
-        <Text className="ml-2 text-white font-JakartaMedium">
-          {getVisibilityText(searchRadius)}
-        </Text>
+        <View className="w-16">
+          <Text
+            className="ml-2 text-white font-JakartaMedium"
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+          >
+            {getVisibilityText(searchRadius)}
+          </Text>
+        </View>
       </TouchableOpacity>
       {editSearchRadius && (
         <Modal

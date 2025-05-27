@@ -24,7 +24,7 @@ const WEEK_MS = 1000 * 60 * 60 * 24 * 7;
 const POP_W               = 0.45;   // pure popularity
 const AFF_W               = 0.95;   // author affinity
 const REC_W               = 0.15;   // freshness
-const TREND_W             = 0.70;   // popularity * freshness “trend” bump
+const TREND_W             = 0.70;   // popularity * freshness "trend" bump
 const POPULARITY_SCALING = 3.0;
 const RECENCY_SCALING = 4.0;
 
@@ -104,20 +104,22 @@ Deno.serve(async (req: Request) => {
       location,
       searchRadius,
       blockedPosts = [],
-      numPostsToAdd
+      numPostsToAdd,
+      channel
     } = await req.json();
 
     if (!location) throw new Error("location missing");
     if (typeof searchRadius !== "number" || searchRadius <= 0)
-      throw new Error("searchRadius must be > 0");
+      throw new Error("searchRadius must be > 0");
     if (typeof numPostsToAdd !== "number" || numPostsToAdd <= 0)
-      throw new Error("numPostsToAdd must be > 0");
+      throw new Error("numPostsToAdd must be > 0");
 
     /* -------- get candidate posts in one RPC --------------------------- */
     const { data: posts, error: postsErr } = await supabase.rpc("get_posts", {
       p_lon: location.longitude,
       p_lat: location.latitude,
-      p_rad: searchRadius
+      p_rad: searchRadius,
+      p_channel: channel
     });
     if (postsErr) throw postsErr;
 

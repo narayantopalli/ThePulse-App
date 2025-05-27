@@ -2,8 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import NiceButton from "@/components/buttons/niceButton";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
-import { View, TextInput } from "react-native";
+import { View, TextInput, Text } from "react-native";
 import { router } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import BackButton from "@/components/buttons/backButton";
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from "react-native";
 
 const NameEdit = () => {
   const { userMetadata, setUserMetadata } = useSession();
@@ -12,7 +16,6 @@ const NameEdit = () => {
   const firstNameRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    // Focus the first name input when component mounts
     setTimeout(() => {
       firstNameRef.current?.focus();
     }, 100);
@@ -26,7 +29,6 @@ const NameEdit = () => {
         });
         if (error) throw error;
 
-        // Update users table
         const { error: profileErr } = await supabase
           .from('profiles')
           .update({ first_name: firstName, last_name: lastName })
@@ -42,39 +44,67 @@ const NameEdit = () => {
   };
 
   return (
-    <View className="flex-1 bg-general-300">
-      <View className="flex-1 mx-4 mt-4">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-gray-50">
+      <View className="flex-1">
+        <View className="flex flex-row items-center bg-white px-4 h-14 shadow-sm">
+          <BackButton onPress={() => router.replace("/settings")} />
+          <Text className="text-xl font-JakartaBold ml-2">Edit Name</Text>
+        </View>
+
+        <View className="flex-1 px-4 pt-6">
+          <Text className="text-gray-500 font-JakartaMedium mb-4 text-sm">YOUR NAME</Text>
+          
           <View className="space-y-4">
-              <View className="bg-white border-2 border-black rounded-2xl h-16 p-4">
-                  <TextInput
-                      ref={firstNameRef}
-                      className="text-black text-xl font-JakartaMedium"
-                      placeholder="First name..."
-                      value={firstName}
-                      onChangeText={setFirstName}
-                      autoCorrect={true}
-                      autoCapitalize="sentences"
-                  />
-              </View>
-              <View className="bg-white border-2 border-black rounded-2xl h-16 p-4 mt-4">
-                  <TextInput
-                      className="text-black text-xl font-JakartaMedium"
-                      placeholder="Last name..."
-                      value={lastName}
-                      onChangeText={setLastName}
-                      autoCorrect={true}
-                      autoCapitalize="sentences"
-                  />
-              </View>
+            <View className="bg-white rounded-xl p-4 shadow-sm mb-4">
+              <Text className="text-gray-500 text-sm font-JakartaMedium">First Name</Text>
+              <TextInput
+                ref={firstNameRef}
+                placeholder="Enter first name"
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCorrect={true}
+                autoCapitalize="words"
+                style={{ 
+                  minHeight: 32,
+                  fontFamily: "font-JakartaRegular",
+                  fontSize: 18,
+                  color: "#333",
+                  textAlignVertical: 'center'
+                }}
+              />
+            </View>
+
+            <View className="bg-white rounded-xl p-4 shadow-sm">
+              <Text className="text-gray-500 text-sm font-JakartaMedium">Last Name</Text>
+              <TextInput
+                placeholder="Enter last name"
+                value={lastName}
+                onChangeText={setLastName}
+                autoCorrect={true}
+                autoCapitalize="words"
+                style={{ 
+                  minHeight: 32,
+                  fontFamily: "font-JakartaRegular",
+                  fontSize: 18,
+                  color: "#333",
+                  textAlignVertical: 'center'
+                }}
+              />
+            </View>
           </View>
-          <NiceButton
-              title="Confirm Name"
+
+          <View className="mt-8">
+            <TouchableOpacity
               onPress={OnConfirm}
-              className="mt-6"
-              bgVariant="success"
-          />
+              className="bg-blue-500 p-4 rounded-xl shadow-sm flex-row items-center justify-center"
+            >
+              <Ionicons name="checkmark" size={24} color="white" className="mr-2" />
+              <Text className="text-white text-lg font-JakartaMedium">Save Changes</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

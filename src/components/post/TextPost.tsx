@@ -12,7 +12,7 @@ const TextPost = forwardRef<TextInput, TextPostProps>(({
     <View className="bg-white rounded-2xl p-4 mb-4 shadow-sm">
       <TextInput
         ref={ref}
-        className="text-black text-lg font-JakartaMedium mb-2 min-h-[100px]"
+        className="mb-2 min-h-[100px]"
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
         multiline
@@ -21,7 +21,13 @@ const TextPost = forwardRef<TextInput, TextPostProps>(({
         autoCorrect={true}
         autoCapitalize="sentences"
         maxLength={maxLength}
-        style={{ textAlignVertical: 'top' }}
+        style={{
+          fontFamily: "font-JakartaRegular",
+          fontSize: 18,
+          color: "#333",
+          paddingVertical: 8,
+          textAlignVertical: 'top'
+        }}
       />
       <View className="flex-row justify-end">
         <Text className="text-gray-400 font-JakartaRegular">

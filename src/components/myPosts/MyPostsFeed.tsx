@@ -13,7 +13,7 @@ const MyPostsFeed = () => {
         <Text className="text-base text-gray-500 text-center px-8 mb-4">
           Share your thoughts and experiences with the community
         </Text>
-        <AddPostButton />
+        <AddPostButton sizeMultiplier={1.25} />
       </View>
     );
   }

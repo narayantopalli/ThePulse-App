@@ -24,7 +24,7 @@ const ForgotPassword = () => {
 
     try {
       const url = Linking.createURL('/(auth)/reset-password');
-      console.log(url);
+      console.log("URL:", url);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: url,
       });
@@ -51,7 +51,7 @@ const ForgotPassword = () => {
           style={styles.headerImage}
         />
         <View className="absolute top-12 left-4">
-          <BackButton onPress={() => router.back()} />
+          <BackButton onPress={() => router.replace("/(auth)/sign-in")} />
         </View>
         <View className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white to-transparent">
           <Text className="text-3xl text-black font-JakartaSemiBold">
@@ -86,13 +86,20 @@ const ForgotPassword = () => {
               <Text className="text-sm text-gray-600 mb-2 font-JakartaMedium">Email</Text>
               <View className="relative">
                 <TextInput
-                  className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                  className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                   placeholder="Enter your email"
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   placeholderTextColor="#9CA3AF"
+                  style={{
+                    fontFamily: "font-JakartaRegular",
+                    fontSize: 18,
+                    color: "#333",
+                    paddingVertical: 8,
+                    textAlignVertical: 'center'
+                  }}
                 />
               </View>
             </View>

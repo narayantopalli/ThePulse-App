@@ -71,7 +71,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
       <View className="flex-row items-center mb-3">
         <TouchableOpacity 
           onPress={() => !post.anonymous ? router.push({
-            pathname: post.user_id === userMetadata?.id ? "/profile" : "/(root)/(edit)/public-profile", 
+            pathname: post.user_id === userMetadata?.id ? "/profile" : "/(root)/(social)/public-profile", 
             params: {userID: post.user_id}
           }) : null}
           className="relative"

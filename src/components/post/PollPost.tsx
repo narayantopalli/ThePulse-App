@@ -30,20 +30,34 @@ const PollPost = forwardRef<TextInput, PollPostProps>(({
     <View className="bg-white rounded-2xl p-4 pt-2 mb-4 shadow-sm border border-gray-100">
       <TextInput
         ref={ref}
-        className="text-black text-xl font-JakartaMedium mb-4 h-12 border-b border-gray-100"
+        className="mb-4 h-12 border-b border-gray-100"
         placeholder="Ask a question..."
         placeholderTextColor="#9CA3AF"
         value={question}
         onChangeText={onQuestionChange}
+        style={{
+          fontFamily: "font-JakartaRegular",
+          fontSize: 18,
+          color: "#333",
+          paddingVertical: 8,
+          textAlignVertical: 'center'
+        }}
       />
       {options.map((option, index) => (
         <View key={index} className="flex-row items-center mb-3">
           <TextInput
-            className="flex-1 text-black font-JakartaMedium bg-gray-50 px-4 py-3 rounded-xl"
+            className="flex-1 bg-gray-50 px-4 py-3 rounded-xl"
             placeholder={`Option ${index + 1}`}
             placeholderTextColor="#9CA3AF"
             value={option}
             onChangeText={(text) => updateOption(index, text)}
+            style={{
+              fontFamily: "font-JakartaRegular",
+              fontSize: 18,
+              color: "#333",
+              paddingVertical: 8,
+              textAlignVertical: 'center'
+            }}
           />
           {options.length > 2 && (
             <TouchableOpacity 

@@ -12,7 +12,7 @@ const ResponsePost = forwardRef<TextInput, ResponsePostProps>(({
       <Text className="text-general-700 font-JakartaMedium mb-3 text-base">Prompt for Responses</Text>
       <TextInput
         ref={ref}
-        className="text-black text-lg font-JakartaMedium mb-2 bg-gray-50 rounded-xl p-3 min-h-[100px] border border-gray-200"
+        className="mb-2 bg-gray-50 rounded-xl p-3 min-h-[100px] border border-gray-200"
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
         multiline
@@ -32,6 +32,10 @@ const ResponsePost = forwardRef<TextInput, ResponsePostProps>(({
 const styles = StyleSheet.create({
   textInput: {
     textAlignVertical: 'top',
+    fontFamily: "font-JakartaRegular",
+    fontSize: 18,
+    color: "#333",
+    paddingVertical: 8,
   },
 });
 

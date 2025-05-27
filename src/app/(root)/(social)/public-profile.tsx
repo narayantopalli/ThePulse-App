@@ -1,5 +1,5 @@
 import { View, ScrollView, Text } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { useState, useEffect } from "react";
 import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/utils/supabase";
@@ -8,6 +8,9 @@ import Status from "@/components/status";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileBio from "@/components/profile/ProfileBio";
 import AnonymousToggle from "@/components/AnonymousToggle";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import BackButton from "@/components/buttons/backButton";
+import SmallProfilePhoto from "@/components/smallProfilePhoto";
 
 const PublicProfile = () => {
   const { userID } = useLocalSearchParams<{ userID: string }>();
@@ -59,18 +62,27 @@ const PublicProfile = () => {
   }
 
   return (
-    <View className="flex-1 bg-general-300">
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <View className="flex-1 bg-gradient-to-b from-general-300 to-general-200">
+      <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
+        <BackButton onPress={() => router.back()} />
+        <View className="border-2 border-black rounded-full overflow-hidden">
+          <SmallProfilePhoto />
+        </View>
+      </View>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
         <ProfileHeader 
           userMetadata={{
             id: user.id,
             firstname: user.firstname,
             lastname: user.lastname,
             birthday: user.birthday,
-            gender: user.gender,
-            last_posted: user.last_posted,
+            pronouns: user.pronouns,
+            last_posted: user.last_posted,  
             avatar_url: user.avatar_url,
             bio: user.bio,
+            words_left: user.words_left,
+            current_score: 0,
+            current_ranking: 0
           }}
           profilePhotoURL={localProfilePhotoURL}
           isOwnProfile={false}
@@ -81,19 +93,22 @@ const PublicProfile = () => {
           isOwnProfile={false}
         />
         
-        <View className="mt-4 mx-4 mb-32">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-black text-2xl font-JakartaMedium">Current Status</Text>
+        <View className="px-4 py-4">
+          <View className="flex-row items-center justify-between mb-2">
+            <View className="flex-row items-center">
+              <View className="bg-white/80 p-1.5 rounded-full">
+                <MaterialCommunityIcons name="heart-pulse" size={22} color="#000" />
+              </View>
+              <Text className="text-black text-lg font-JakartaBold ml-2">Current Status</Text>
+            </View>
           </View>
-          <Status 
-            user_id={userID} 
-          />
+          <View className="bg-white/90 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-sm border border-gray-100">
+            <Status 
+              user_id={userID} 
+            />
+          </View>
         </View>
       </ScrollView>
-      <AnonymousToggle 
-        isAnonymous={isAnonymous}
-        setIsAnonymous={setIsAnonymous}
-      />
     </View>
   );
 }

@@ -4,7 +4,6 @@ import { Text, View, Image, Platform, StyleSheet, TextInput, TouchableOpacity, K
 import { useState, useRef } from "react";
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { supabase } from "@/utils/supabase";
-import { useSession } from "@/contexts/SessionContext";
 // import {
 //   GoogleSignin,
 //   GoogleSigninButton,
@@ -36,7 +35,7 @@ const SignIn = () => {
       });
 
       if (credential.identityToken) {
-        const { error, data: { user } } = await supabase.auth.signInWithIdToken({
+        const { data: { user }, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: credential.identityToken,
         });
@@ -45,10 +44,16 @@ const SignIn = () => {
         .select('*').eq('id', user?.id)
 
         if (!error) {
-          if (userData && userData[0].firstname && userData[0].lastname) {
+          if (userData && userData[0].birthday) {
             router.replace("/(root)/(tabs)/home");
           } else {
-            router.replace("/(auth)/setup");
+            router.replace({
+              pathname: "/(auth)/setup",
+              params: {
+                firstname: `${credential.fullName?.givenName}`,
+                lastname: `${credential.fullName?.familyName}`
+              },
+            });
           }
         } else {
           setErrorMessage(error.message);
@@ -84,7 +89,7 @@ const SignIn = () => {
         const { data: userData, error: userError } = await supabase.from('profiles')
           .select('*').eq('id', user?.id);
 
-        if (userData && userData[0].firstname && userData[0].lastname) {
+        if (userData && userData[0].birthday) {
           router.replace("/(root)/(tabs)/home");
         } else {
           router.replace("/(auth)/setup");
@@ -175,7 +180,7 @@ const SignIn = () => {
                 <View className="relative">
                   <TextInput
                     ref={emailInputRef}
-                    className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                    className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                     placeholder="Enter your email"
                     value={email}
                     onChangeText={setEmail}
@@ -184,6 +189,13 @@ const SignIn = () => {
                     placeholderTextColor="#9CA3AF"
                     returnKeyType="next"
                     onSubmitEditing={() => passwordInputRef.current?.focus()}
+                    style={{
+                      fontFamily: "font-JakartaRegular",
+                      fontSize: 18,
+                      color: "#333",
+                      paddingVertical: 8,
+                      textAlignVertical: 'center'
+                    }}
                   />
                 </View>
               </View>
@@ -192,7 +204,7 @@ const SignIn = () => {
                 <View className="relative">
                   <TextInput
                     ref={passwordInputRef}
-                    className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                    className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                     placeholder="Enter your password"
                     value={password}
                     onChangeText={setPassword}
@@ -200,6 +212,13 @@ const SignIn = () => {
                     placeholderTextColor="#9CA3AF"
                     returnKeyType="done"
                     onSubmitEditing={handleEmailSignIn}
+                    style={{
+                      fontFamily: "font-JakartaRegular",
+                      fontSize: 18,
+                      color: "#333",
+                      paddingVertical: 8,
+                      textAlignVertical: 'center'
+                    }}
                   />
                 </View>
                 <TouchableOpacity 

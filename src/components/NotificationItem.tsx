@@ -43,7 +43,7 @@ const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemPro
             } else {
               router.push(
                 {
-                  pathname: `/(root)/(edit)/public-profile`,
+                  pathname: `/(root)/(social)/public-profile`,
                   params: {
                     userID: item.sender_id
                   }

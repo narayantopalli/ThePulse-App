@@ -13,6 +13,8 @@ const clearAsyncStorage = async (user_id: string) => {
         await AsyncStorage.removeItem("LOCAL_AVATAR_PATH");
         await AsyncStorage.removeItem("searchRadius");
         await AsyncStorage.removeItem("blockedPosts");
+        await AsyncStorage.removeItem("channel");
+        await AsyncStorage.removeItem("forceAnonymous");
     } catch (error) {
         console.error('Error clearing AsyncStorage:', error);
     }

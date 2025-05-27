@@ -1,30 +1,29 @@
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import { useSession } from "@/contexts/SessionContext";
 import { useState, useEffect, useMemo } from "react";
 import * as Location from 'expo-location';
 import { Region } from 'react-native-maps';
 import CustomMapView from "@/components/map/MapView";
-import { resetFeed } from "@/utils/nextFeed";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import createHotspots from "@/utils/createHotspots";
+import React from "react";
+import { loadActivityFromDatabase } from "@/utils/getActivity";
 
 const Map = () => {
-  const { location, feed, setFeed, searchRadius, blockedPosts, userMetadata, session } = useSession();
+  const { location, searchRadius } = useSession();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
   const [locationObject, setLocationObject] = useState<Location.LocationObject | null>(null);
+  const [activity, setActivity] = useState<any[]>([]);
 
   const hotspots = useMemo(() => {
-    if (!feed || feed.length === 0) return [];
-    return createHotspots(feed);
-  }, [feed]);
+    if (!activity || activity.length === 0) return [];
+    return createHotspots(activity);
+  }, [activity]);
 
   useEffect(() => {
     if (location) {
       (async () => {
-        const newFeed = await resetFeed(session, location[0], location[1], searchRadius, blockedPosts, 10);
-        setFeed(newFeed);
-        AsyncStorage.setItem(`feed_${userMetadata?.id}`, JSON.stringify(newFeed));
+        await loadActivityFromDatabase(location, searchRadius, setActivity);
       })();
     }
   }, [searchRadius]);
@@ -57,13 +56,13 @@ const Map = () => {
   }, [location, hotspots]);
 
   return (
-    <View className="flex-1 bg-general-300">
+    <>
       {errorMsg ? (
         <Text className="text-red-500 p-4">{errorMsg}</Text>
       ) : (
         <CustomMapView region={region} setRegion={setRegion} location={locationObject} hotspots={hotspots}/>
       )}
-    </View>
+    </>
   );
 };
 

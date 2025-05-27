@@ -86,13 +86,20 @@ const SignUp = () => {
                     <View className="relative">
                       <TextInput
                         ref={emailRef}
-                        className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                        className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                         placeholder="Enter your email"
                         value={email}
                         onChangeText={setEmail}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         placeholderTextColor="#9CA3AF"
+                        style={{
+                          fontFamily: "font-JakartaRegular",
+                          fontSize: 18,
+                          color: "#333",
+                          paddingVertical: 8,
+                          textAlignVertical: 'center'
+                        }}
                         returnKeyType="next"
                         onSubmitEditing={() => passwordRef.current?.focus()}
                       />
@@ -103,7 +110,7 @@ const SignUp = () => {
                     <View className="relative">
                       <TextInput
                         ref={passwordRef}
-                        className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                        className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                         placeholder="Enter your password"
                         value={password}
                         onChangeText={setPassword}
@@ -119,7 +126,7 @@ const SignUp = () => {
                     <View className="relative">
                       <TextInput
                         ref={confirmPasswordRef}
-                        className="w-full h-14 px-4 border border-gray-200 rounded-xl font-JakartaRegular bg-gray-50"
+                        className="w-full h-14 px-4 border border-gray-200 rounded-xl bg-gray-50"
                         placeholder="Confirm your password"
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
@@ -127,6 +134,13 @@ const SignUp = () => {
                         placeholderTextColor="#9CA3AF"
                         returnKeyType="done"
                         onSubmitEditing={handleSignUp}
+                        style={{
+                          fontFamily: "font-JakartaRegular",
+                          fontSize: 18,
+                          color: "#333",
+                          paddingVertical: 8,
+                          textAlignVertical: 'center'
+                        }}
                       />
                     </View>
                   </View>
