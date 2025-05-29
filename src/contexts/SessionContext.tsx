@@ -22,7 +22,6 @@ import { loadNotifications } from "@/utils/getNotifications";
 import { loadGroupRequestsFromDatabase, loadGroupRequestsFromLocalStorage, loadMyGroupsFromDatabase } from "@/utils/loadGroups";
 import { loadMyGroupsFromLocalStorage } from "@/utils/loadGroups";
 import { getLocationString } from "@/hooks/getLocationString";
-import { loadActivityFromDatabase, reportActivity } from "@/utils/getActivity";
 
 const BUCKET           = "images";   // storage bucket
 const STORAGE_KEY      = "LOCAL_AVATAR_PATH";
@@ -104,12 +103,6 @@ export const SessionProvider = ({ children }: Props) => {
   }, [location]);
 
   useEffect(() => {
-    if (userMetadata?.id && location) {
-      reportActivity(location, userMetadata.id);
-    }
-  }, [userMetadata?.id, location]);
-
-  useEffect(() => {
     if (userMetadata?.id) {
       loadMyGroupsFromLocalStorage(userMetadata.id, setMyGroups);
       loadMyGroupsFromDatabase(userMetadata.id, setMyGroups);
@@ -125,7 +118,7 @@ export const SessionProvider = ({ children }: Props) => {
     AsyncStorage.getItem('blockedPosts').then((posts) => {
       if (posts) setBlockedPosts(JSON.parse(posts));
     });
-    supabase.from('reports').select('post_id').eq('user_id', userMetadata?.id).then(({ data }) => {
+    supabase.from('reports').select('post_id').eq('user_id', userMetadata?.id).not('post_id', 'is', null).then(({ data }) => {
       if (data) setBlockedPosts(data.map((post) => post.post_id));
       AsyncStorage.setItem('blockedPosts', JSON.stringify(blockedPosts));
     });

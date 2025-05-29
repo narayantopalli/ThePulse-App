@@ -26,6 +26,11 @@ const NotificationItem = ({ item, onIgnore, currentUserId }: NotificationItemPro
     return 'interacted with your post';
   };
 
+  const handleReport = () => {
+    // TODO: Implement report functionality
+    console.log('Report response:', item.id);
+  };
+
   const senderName = item.data.anonymous 
     ? 'Anonymous'
     : `${item.sender.firstname} ${item.sender.lastname}`;

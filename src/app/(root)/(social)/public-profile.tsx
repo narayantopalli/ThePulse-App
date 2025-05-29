@@ -88,11 +88,6 @@ const PublicProfile = () => {
           isOwnProfile={false}
         />
         
-        <ProfileBio 
-          bio={user.bio}
-          isOwnProfile={false}
-        />
-        
         <View className="px-4 py-4">
           <View className="flex-row items-center justify-between mb-2">
             <View className="flex-row items-center">

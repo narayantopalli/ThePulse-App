@@ -111,7 +111,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
             <Text className="text-black font-JakartaSemiBold text-xl">
               {post.anonymous ? "Anonymous" : `${post.user_data.firstname || ''}`}
             </Text>
-            <ReportButton postId={post.id} />
+            <ReportButton id={post.id} type="post" />
           </View>
           <View className="flex-row items-center flex-wrap">
             <Text className="text-gray-500 text-sm">

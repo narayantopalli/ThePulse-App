@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/utils/supabase";
 
-const ReportButton = ({ postId }: { postId: string }) => {
+const ReportButton = ({ id, type }: { id: string, type: 'post' | 'response' | 'status' }) => {
   const { userMetadata, blockedPosts, setBlockedPosts } = useSession();
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("");
@@ -15,13 +15,15 @@ const ReportButton = ({ postId }: { postId: string }) => {
     }
     const { error } = await supabase.from('reports').insert({
       user_id: userMetadata?.id,
-      post_id: postId,
+      [type === 'post' ? 'post_id' : type === 'response' ? 'response_id' : 'status_id']: id,
       reason: reportReason,
     });
     if (error) {
       console.error('Error reporting post:', error);
     } else {
-      setBlockedPosts([...blockedPosts, postId]);
+      if (type === 'post') {
+        setBlockedPosts([...blockedPosts, id]);
+      }
       setReportModalVisible(false);
       setReportReason("");
     }
@@ -51,7 +53,7 @@ const ReportButton = ({ postId }: { postId: string }) => {
         >
           <View className="flex-1 justify-center items-center bg-black/50">
             <View className="bg-white rounded-2xl p-6 w-[90%] max-w-[400px]">
-              <Text className="text-xl font-JakartaSemiBold mb-4">Report Post</Text>
+              <Text className="text-xl font-JakartaSemiBold mb-4">Report {type === 'post' ? 'Post' : type === 'response' ? 'Response' : 'Status'}</Text>
               <View className="mb-4">
                 <Text className="text-gray-600 mb-2">Reason:</Text>
                 <TextInput

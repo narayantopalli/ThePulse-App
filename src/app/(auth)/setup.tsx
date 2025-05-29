@@ -142,10 +142,9 @@ const Setup = () => {
     setError("");
     Keyboard.dismiss();
 
-    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
     const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (cameraStatus === 'granted' && libraryStatus === 'granted') {
+    if (libraryStatus === 'granted') {
       const source = await new Promise(resolve => {
         resolve("library");
       });
@@ -193,7 +192,7 @@ const Setup = () => {
                     style={{ 
                       minHeight: 32,
                       fontFamily: "font-JakartaRegular",
-                      fontSize: 18,
+                      fontSize: 14,
                       color: "#333",
                       textAlignVertical: 'center'
                     }}
@@ -211,7 +210,7 @@ const Setup = () => {
                     style={{ 
                       minHeight: 32,
                       fontFamily: "font-JakartaRegular",
-                      fontSize: 18,
+                      fontSize: 14,
                       color: "#333",
                       textAlignVertical: 'center'
                     }}

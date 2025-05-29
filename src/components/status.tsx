@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getLocalImageURI } from "@/utils/getImage";
@@ -10,6 +10,7 @@ import { useSession } from "@/contexts/SessionContext";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { formatTimeAgo } from '@/hooks/formatTimeAgo';
 import { useRouter } from 'expo-router';
+import ReportButton from './ReportButton';
 
 const Status = ({ user_id }: StatusProps) => {
     const [status, setStatus] = useState<any>();
@@ -164,10 +165,11 @@ const Status = ({ user_id }: StatusProps) => {
                     )}
                   </View>
               </View>
-              <View className="flex-row items-center mb-4 mx-16 border-2 border-black rounded-2xl">
+              <View className="flex-row items-center mb-4 mx-8 border-2 border-black rounded-2xl">
                 <Image
                   source={{ uri: status.image_url }}
-                  className="w-full aspect-[5/7] rounded-xl"
+                  className="w-full rounded-xl"
+                  style={{ aspectRatio: 1 }}
                   resizeMode="cover"
                 />
               </View>
@@ -180,20 +182,23 @@ const Status = ({ user_id }: StatusProps) => {
                     </Text>
                   </View>
                 ) : (
-                  <TouchableOpacity 
-                    onPress={handleLike}
-                    className="flex-row items-center"
-                  >
-                    <FontAwesome6 
-                      name="heart" 
-                      size={20} 
-                      color={liked ? "#ef4444" : "#6b7280"}
-                      solid={liked}
-                    />
-                    <Text className="ml-2 text-gray-600 font-JakartaMedium">
-                      {likes} {likes === 1 ? 'like' : 'likes'}
-                    </Text>
-                  </TouchableOpacity>
+                  <>
+                    <TouchableOpacity 
+                      onPress={handleLike}
+                      className="flex-row items-center"
+                    >
+                      <FontAwesome6 
+                        name="heart" 
+                        size={20} 
+                        color={liked ? "#ef4444" : "#6b7280"}
+                        solid={liked}
+                      />
+                      <Text className="ml-2 text-gray-600 font-JakartaMedium">
+                        {likes} {likes === 1 ? 'like' : 'likes'}
+                      </Text>
+                    </TouchableOpacity>
+                    <ReportButton id={status.id} type="status" />
+                  </>
                 )}
               </View>
               <View className="bg-gray-50 rounded-2xl p-4">
@@ -206,8 +211,9 @@ const Status = ({ user_id }: StatusProps) => {
         ) : (
             isOwnProfile ? (
               <TouchableOpacity 
-                onPress={() => router.replace({pathname: "/(root)/camera", params: { path: "/(root)/(social)/update-status", returnPath: "/(root)/(tabs)/profile", savePhoto: "false" }})}
-                className="flex items-center justify-center py-8"
+                onPress={() => router.replace({pathname: "/(root)/camera", params: { path: "/(root)/(social)/update-status", returnPath: "/(root)/(tabs)/profile" }})}
+                className="flex items-center justify-center"
+                style={{ aspectRatio: 1 }}
               >
                 <FontAwesome6 name="circle-exclamation" size={40} color="#6b7280" />
                 <Text className="text-gray-500 text-xl font-JakartaMedium mt-3">
@@ -218,7 +224,7 @@ const Status = ({ user_id }: StatusProps) => {
                 </Text>
               </TouchableOpacity>
             ) : (
-              <View className="flex items-center justify-center py-8">
+              <View className="flex items-center justify-center" style={{ aspectRatio: 1 }}>
                 <FontAwesome6 name="circle-exclamation" size={40} color="#6b7280" />
                 <Text className="text-gray-500 text-xl font-JakartaMedium mt-3">
                   No current status

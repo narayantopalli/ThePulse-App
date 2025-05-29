@@ -1,15 +1,13 @@
 import { Text, View, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
-import { useSession } from "@/contexts/SessionContext";
 import { ProfileBioProps } from "@/types/type";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ProfileBio = ({ bio, isOwnProfile = false }: ProfileBioProps) => {
-  const { userMetadata } = useSession();
-  const bioText = bio || userMetadata?.bio;
+  const bioText = bio || "";
 
   return (
-    <View className="px-4 mt-4">
+    <View className="ml-4">
       <View className="flex-row items-center justify-between mb-2">
         <View className="flex-row items-center">
           <View className="bg-white/80 p-1.5 rounded-full mr-2">
@@ -28,9 +26,9 @@ const ProfileBio = ({ bio, isOwnProfile = false }: ProfileBioProps) => {
         )}
       </View>
       
-      <View className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-gray-100">
+      <View className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-sm border border-gray-100">
         {bioText ? (
-          <Text className="text-gray-800 text-base leading-5 font-JakartaMedium">
+          <Text className="text-gray-800 font-JakartaMedium">
             {bioText}
           </Text>
         ) : (

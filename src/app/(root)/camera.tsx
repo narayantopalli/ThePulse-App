@@ -9,13 +9,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const Camera = () => {
-  const { path, returnPath, lockFront } = useLocalSearchParams<{ path: string, returnPath: string, savePhoto: string, lockFront: string }>();
+  const { path, returnPath, aspectRatio = "1:1", caption, postType, pollOptions } = useLocalSearchParams<{ path: string, returnPath: string, aspectRatio: string, caption: string, postType: string, pollOptions: string[] }>();
   const [facing, setFacing] = useState<CameraType>('front');
   const [flash, setFlash] = useState<FlashMode>('auto');
   const [permission, requestPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const [zoom, setZoom] = useState(0);
-  const [photo, setPhoto] = useState<string | null>(null);
   const cameraRef = useRef<CameraView>(null);
 
   if (!permission || !mediaPermission) {
@@ -79,55 +78,33 @@ const Camera = () => {
               { compress: 1, format: SaveFormat.PNG }
           );
       }
-      setPhoto(photo.uri);
+      handleUsePhoto(photo.uri);
     } catch (error) {
       console.error('Error taking picture:', error);
     }
   }
 
-  async function handleUsePhoto() {
-    if (photo) {
+  async function handleUsePhoto(photoUri: string) {
+    if (photoUri) {
       try {
         // Then navigate with the photo
         router.push({
-          pathname: path as any,
+          pathname: "/(root)/crop-photo",
           params: { 
-            newPhotoUri: photo
+            newPhotoUri: photoUri,
+            path: path as any,
+            returnPath: returnPath as any,
+            aspectRatio: aspectRatio as any,
+            caption: caption,
+            postType: postType,
+            pollOptions: pollOptions
           }
         });
       } catch (error) {
-        console.error('Error saving photo:', error);
-        alert('Failed to save photo');
+        console.error('Error using photo:', error);
+        alert('Failed to use photo');
       }
     }
-  }
-
-  if (photo) {
-    return (
-      <View className="flex-1 bg-black">
-        <Image 
-          source={{ uri: photo }} 
-          className="flex-1 bottom-[5%]" 
-          resizeMode='contain'
-        />
-        <View className="absolute bottom-0 left-0 right-0 top-[75%] bg-black/50">
-          <View className="flex-row justify-between mt-24 m-8">
-            <TouchableOpacity 
-              className="px-6 py-3 bg-white/30 rounded-full active:bg-white/40"
-              onPress={() => setPhoto(null)}
-            >
-              <Text className="text-white font-semibold text-base">Retake</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              className="px-6 py-3 bg-blue-500/80 rounded-full active:bg-blue-500/90"
-              onPress={handleUsePhoto}
-            >
-              <Text className="text-white font-semibold text-base">Use Photo</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    );
   }
 
   return (
@@ -197,14 +174,12 @@ const Camera = () => {
                   color={flash === 'off' || flash === 'auto' ? '#FFFFFF40' : 'white'} 
                 />
               </TouchableOpacity>
-              {lockFront !== 'true' && (
-                <TouchableOpacity 
-                  className="w-12 h-12 rounded-full bg-white/20 items-center justify-center border-2 border-white/30"
-                  onPress={toggleCameraFacing}
-                >
-                  <FontAwesome6 name="rotate" size={20} color="white" />
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity 
+                className="w-12 h-12 rounded-full bg-white/20 items-center justify-center border-2 border-white/30"
+                onPress={toggleCameraFacing}
+              >
+                <FontAwesome6 name="rotate" size={20} color="white" />
+              </TouchableOpacity>
             </View>
           </View>
         </View>

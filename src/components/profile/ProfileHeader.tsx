@@ -8,6 +8,7 @@ import { ProfileHeaderProps } from "@/types/type";
 import { useSession } from '@/contexts/SessionContext';
 import { supabase } from '@/utils/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ProfileBio from './ProfileBio';
 
 const ProfileHeader = ({ 
   onPhotoPress, 
@@ -50,15 +51,21 @@ const ProfileHeader = ({
         console.error('Error fetching score and ranking:', error);
       }
     }
-    AsyncStorage.getItem(`${userMetadata?.id}-numGroups`).then((value) => {
+    const getNumGroups = async () => {
+      const value = await AsyncStorage.getItem(`${userMetadata?.id}-numGroups`);
       setNumGroups(parseInt(value || '0'));
-    });
-    AsyncStorage.getItem(`${userMetadata?.id}-score`).then((value) => {
+    };
+    getNumGroups();
+    const getScore = async () => {
+      const value = await AsyncStorage.getItem(`${userMetadata?.id}-score`);
       setScore(parseInt(value || '0'));
-    }); 
-    AsyncStorage.getItem(`${userMetadata?.id}-ranking`).then((value) => {  
+    };
+    getScore();
+    const getRanking = async () => {
+      const value = await AsyncStorage.getItem(`${userMetadata?.id}-ranking`);
       setRanking(parseInt(value || '0'));
-    });
+    };
+    getRanking();
     fetchScoreAndRanking();
   }, [userMetadata]);
 
@@ -117,23 +124,31 @@ const ProfileHeader = ({
       </View>
 
       {/* Bio Section */}
-      <View className="mt-4 ml-4">
-        <Text className="text-black text-lg font-JakartaBold">
-          {`${userMetadata?.firstname || ''} ${userMetadata?.lastname || ''}`}
-        </Text>
-        {age !== null && (
-          <Text className="text-gray-600 text-base mt-1">
-            {`${age} years old`}
+      <View className="flex-row justify-between">
+        <View className="mt-4 ml-4 w-32">
+          <Text numberOfLines={1} adjustsFontSizeToFit={true} minimumFontScale={0.5} className="text-black text-lg font-JakartaBold">
+            {`${userMetadata?.firstname || ''} ${userMetadata?.lastname || ''}`}
           </Text>
-        )}
-        {userMetadata?.pronouns && (
-          <Text className="text-gray-600 text-base mt-1">
-            {userMetadata.pronouns}
+          {age !== null && (
+            <Text numberOfLines={1} adjustsFontSizeToFit={true} minimumFontScale={0.5} className="text-gray-600 text-base mt-1">
+              {`${age} years old`}
+            </Text>
+          )}
+          {userMetadata?.pronouns && (
+            <Text numberOfLines={1} adjustsFontSizeToFit={true} minimumFontScale={0.5} className="text-gray-600 text-base mt-1">
+              {userMetadata.pronouns}
+            </Text>
+          )}
+          <Text numberOfLines={1} adjustsFontSizeToFit={true} minimumFontScale={0.5} className="text-gray-500 text-sm mt-2">
+            {`Last active ${formatLastActive(userMetadata?.last_posted).toLowerCase()}`}
           </Text>
-        )}
-        <Text className="text-gray-500 text-sm mt-2">
-          {`Last active ${formatLastActive(userMetadata?.last_posted).toLowerCase()}`}
-        </Text>
+        </View>
+        <View className="flex-1 ml-8">
+          <ProfileBio 
+            bio={userMetadata?.bio}
+            isOwnProfile={isOwnProfile}
+          />
+        </View>
       </View>
 
       {/* Action Buttons */}

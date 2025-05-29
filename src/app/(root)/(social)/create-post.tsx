@@ -17,12 +17,12 @@ import SmallProfilePhoto from "@/components/smallProfilePhoto";
 type PostType = 'text' | 'poll' | 'response';
 
 const CreatePost = () => {
-  const { newPhotoUri } = useLocalSearchParams();
+  const { newPhotoUri, caption: savedCaption, postType: savedPostType, pollOptions: savedPollOptions } = useLocalSearchParams();
   const { userMetadata, setUserMetadata, location, isAnonymous, channel, forceAnonymous } = useSession();
   const [postPhoto, setPostPhoto] = useState<string | null>(newPhotoUri ? newPhotoUri as string : null);
-  const [postType, setPostType] = useState<PostType>('text');
-  const [caption, setCaption] = useState("");
-  const [pollOptions, setPollOptions] = useState(['', '']);
+  const [postType, setPostType] = useState<PostType>(savedPostType as PostType || 'text');
+  const [caption, setCaption] = useState(savedCaption as string || "");
+  const [pollOptions, setPollOptions] = useState(savedPollOptions ? JSON.parse(savedPollOptions as string) : ['', '']);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [visibilityDistance, setVisibilityDistance] = useState<number>(4828);
   const [postAnonymous, setPostAnonymous] = useState<boolean>(isAnonymous);
@@ -47,7 +47,17 @@ const CreatePost = () => {
           [
             {
               text: "Camera",
-              onPress: () => router.push({pathname: "/(root)/camera", params: { path: "/(root)/(social)/create-post" }})
+              onPress: () => router.push({
+                pathname: "/(root)/camera", 
+                params: { 
+                  path: "/(root)/(social)/create-post", 
+                  returnPath: "/(root)/(social)/create-post",
+                  aspectRatio: "3:4",
+                  caption: caption,
+                  postType: postType,
+                  pollOptions: JSON.stringify(pollOptions)
+                }
+              })
             },
             {
               text: "Photo Library", 
@@ -60,14 +70,22 @@ const CreatePost = () => {
       if (source === "library") {
         const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [3, 4],
           quality: 0.9,
           exif: false,
         });
 
         if (!result.canceled && userMetadata?.id) {
-          setPostPhoto(result.assets[0].uri);
+          router.push({
+            pathname: "/(root)/crop-photo", 
+            params: { 
+              newPhotoUri: result.assets[0].uri, 
+              path: "/(root)/(social)/create-post", 
+              aspectRatio: "3:4",
+              caption: caption,
+              postType: postType,
+              pollOptions: JSON.stringify(pollOptions)
+            }
+          })
         }
       }
     } else {

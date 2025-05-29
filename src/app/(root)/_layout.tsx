@@ -10,6 +10,7 @@ const Layout = () => {
         <Stack.Screen name="(social)" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="camera" options={{ headerShown: false }} />
+        <Stack.Screen name="crop-photo" options={{ headerShown: false }} />
       </Stack>
     // </RevenueCatProvider>
   );

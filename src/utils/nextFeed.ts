@@ -1,11 +1,11 @@
 import Constants from "expo-constants";
 import { getLocalImageURI } from "@/utils/getImage";
 
-const resetFeed = async (session: { access_token: string }, latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number, channel: string): Promise<any[]> => {
+const getFeed = async (session: { access_token: string }, currentFeed: any[], latitude: number, longitude: number, searchRadius: number, blockedPosts: any[], numPostsToAdd: number, channel: string): Promise<any[]> => {
   try {
-    if (!session?.access_token) return [];
+    if (!session?.access_token) return currentFeed;
     
-      const { newFeed } = await nextFeed(session, [], latitude, longitude, searchRadius, blockedPosts, numPostsToAdd, channel);
+      const { newFeed } = await nextFeed(session, currentFeed, latitude, longitude, searchRadius, blockedPosts, numPostsToAdd, channel);
 
       if (newFeed.length !== 0) {
         const newFeedWithUserMetadata = await Promise.all(newFeed.map(async (post: any) => ({
@@ -19,12 +19,12 @@ const resetFeed = async (session: { access_token: string }, latitude: number, lo
             avatar_url: post.user_data.avatar_url ? await getLocalImageURI(post.user_data.avatar_url) : null
           } : null
         })));
-        return newFeedWithUserMetadata;
+        return [...currentFeed, ...newFeedWithUserMetadata];
       }
-      return [];
+      return currentFeed;
     } catch (error) {
       console.error('Error fetching feed:', error);
-      return [];
+      return currentFeed;
     }
 };
 
@@ -54,4 +54,4 @@ const nextFeed = async (session: any, feed: any, latitude: number, longitude: nu
   return res;
 }
 
-export { resetFeed, nextFeed };
+export { getFeed, nextFeed };

@@ -14,9 +14,9 @@ import BackButton from "@/components/buttons/backButton";
 import ErrorMessage from "@/components/ErrorMessage";
 
 const UpdateStatus = () => {
-  const { newPhotoUri } = useLocalSearchParams();
+  const { newPhotoUri, caption: savedCaption } = useLocalSearchParams();
   const { userMetadata, setUserMetadata, locationString } = useSession();
-  const [caption, setCaption] = useState("");
+  const [caption, setCaption] = useState(savedCaption as string || "");
   const inputRef = useRef<TextInput>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -101,7 +101,7 @@ const UpdateStatus = () => {
   return (
     <View className="flex-1 bg-gray-100">
       <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
-        <BackButton onPress={() => router.replace("/(root)/(tabs)/profile")} />
+        <BackButton onPress={() => router.replace({pathname: "/(root)/camera", params: { path: "/(root)/(social)/update-status", returnPath: "/(root)/(tabs)/profile", caption: caption }})} />
         <Text className="text-xl font-JakartaBold flex-1 text-center">Update Status</Text>
         <View className="border-2 border-black rounded-full overflow-hidden">
           <SmallProfilePhoto />

@@ -17,6 +17,7 @@ export default function RootLayout() {
   const [title, setTitle] = useState("Home");
   const [whichIcon, setWhichIcon] = useState(0);
   const [showLocation, setShowLocation] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -26,42 +27,47 @@ export default function RootLayout() {
         setTitle("");
         setWhichIcon(0);
         setShowLocation(true);
+        setIsDarkMode(false);
         break;
       case "notifications":
         setTitle("Notifications");
         setShowLocation(false);
         setWhichIcon(0);
+        setIsDarkMode(false);
         break;
       case "profile":
         setTitle("Profile");
         setShowLocation(false);
         setWhichIcon(1);
+        setIsDarkMode(false);
         break;
-      case "map":
-        setTitle("Map");
-        setWhichIcon(0);
+      case "vibe":
+        setTitle("Vibe");
+        setWhichIcon(3);
         setShowLocation(true);
+        setIsDarkMode(true);
         break;
       case "groups":
         setTitle("Groups");
         setWhichIcon(2);
         setShowLocation(false);
+        setIsDarkMode(false);
         break;
     }
   }, [pathname]);
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar style="auto" />
-      <View className="flex-1 ">
-        <SharedHeaderTabs title={title} whichIcon={whichIcon} showLocation={showLocation}/>
+    <View className={`flex-1 ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
+      <StatusBar style={isDarkMode ? "light" : "auto"} />
+      <View className="flex-1">
+        <SharedHeaderTabs title={title} whichIcon={whichIcon} showLocation={showLocation} isDarkMode={isDarkMode}/>
         <View className="flex-1">
           <Tabs
             screenOptions={{ 
-              tabBarActiveTintColor: "#000000",
-              tabBarInactiveTintColor: "#666666",
+              tabBarActiveTintColor: isDarkMode ? "#ffffff" : "#000000",
+              tabBarInactiveTintColor: isDarkMode ? "#666666" : "#666666",
               tabBarStyle: {
-                backgroundColor: "#ffffff",
+                backgroundColor: isDarkMode ? "#000000" : "#ffffff",
                 elevation: 4,
                 shadowColor: "#000000",
                 shadowOffset: { width: 0, height: 2 },
@@ -73,7 +79,7 @@ export default function RootLayout() {
                 left: 0,
                 right: 0,
                 borderTopWidth: 1,
-                borderTopColor: "#e5e5e5"
+                borderTopColor: isDarkMode ? "#333333" : "#e5e5e5"
               },
               tabBarIndicatorStyle: {
                 backgroundColor: 'transparent'
@@ -81,14 +87,14 @@ export default function RootLayout() {
               tabBarShowLabel: false,
               tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                 <View style={{
-                  backgroundColor: focused ? '#000000' : 'transparent',
+                  backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                   borderRadius: 25,
                   padding: 8
                 }}>
                   <MaterialCommunityIcons
                     name={focused ? "home" : "home-outline"}
                     size={32}
-                    color={focused ? '#ffffff' : '#000000'}
+                    color={focused ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#ffffff' : '#000000')}
                   />
                 </View>
               ),
@@ -103,14 +109,14 @@ export default function RootLayout() {
                 headerShown: false,
                 tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                   <View style={{
-                    backgroundColor: focused ? '#000000' : 'transparent',
+                    backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                     borderRadius: 25,
                     padding: 8
                   }}>
                     <MaterialCommunityIcons
                       name={focused ? "home" : "home-outline"}
                       size={32}
-                      color={focused ? '#ffffff' : '#000000'}
+                      color={focused ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#ffffff' : '#000000')}
                     />
                   </View>
                 ),
@@ -124,14 +130,14 @@ export default function RootLayout() {
                 tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                   <View style={{ position: 'relative' }}>
                     <View style={{
-                      backgroundColor: focused ? '#000000' : 'transparent',
+                      backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                       borderRadius: 25,
                       padding: 8
                     }}>
                       <MaterialCommunityIcons
                         name={focused ? "bell" : "bell-outline"}
                         size={32}
-                        color={focused ? '#ffffff' : '#000000'}
+                        color={focused ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#ffffff' : '#000000')}
                       />
                     </View>
                     {notifications?.length > 0 && (
@@ -146,7 +152,7 @@ export default function RootLayout() {
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderWidth: 1,
-                        borderColor: '#ffffff'
+                        borderColor: isDarkMode ? '#000000' : '#ffffff'
                       }}>
                         <Text style={{
                           color: '#ffffff',
@@ -162,20 +168,20 @@ export default function RootLayout() {
               }}
             />
             <Tabs.Screen
-              name="map"
+              name="vibe"
               options={{
-                title: "Map",
+                title: "Vibe",
                 headerShown: false,
                 tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                   <View style={{
-                    backgroundColor: focused ? '#000000' : 'transparent',
+                    backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                     borderRadius: 25,
                     padding: 8
                   }}>
                     <MaterialCommunityIcons
-                      name={focused ? "map-marker" : "map-marker-outline"}
+                      name={focused ? "palette" : "palette-outline"}
                       size={32}
-                      color={focused ? '#ffffff' : '#000000'}
+                      color={focused ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#ffffff' : '#000000')}
                     />
                   </View>
                 ),
@@ -188,14 +194,14 @@ export default function RootLayout() {
                 headerShown: false,
                 tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                   <View style={{
-                    backgroundColor: focused ? '#000000' : 'transparent',
+                    backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                     borderRadius: 25,
                     padding: 8
                   }}>
                     <MaterialCommunityIcons
                       name={focused ? "account-group" : "account-group-outline"}
                       size={32}
-                      color={focused ? '#ffffff' : '#000000'}
+                      color={focused ? (isDarkMode ? '#000000' : '#ffffff') : (isDarkMode ? '#ffffff' : '#000000')}
                     />
                   </View>
                 ),
@@ -208,7 +214,7 @@ export default function RootLayout() {
                 headerShown: false,
                 tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
                   <View style={{
-                    backgroundColor: focused ? '#000000' : 'transparent',
+                    backgroundColor: focused ? (isDarkMode ? '#ffffff' : '#000000') : 'transparent',
                     padding: 2,
                     borderRadius: 25
                   }}>

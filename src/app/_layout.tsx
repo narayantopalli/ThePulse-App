@@ -7,6 +7,7 @@ import { enableFreeze } from 'react-native-screens';
 import { SessionProvider } from "@/contexts/SessionContext";
 import { SearchProvider } from "@/contexts/SearchContext";
 import "../../global.css";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 enableFreeze(true);
 
@@ -37,12 +38,14 @@ const Layout = () => {
   return (
     <SessionProvider>
       <SearchProvider>
-        <Stack screenOptions={{ animation: "fade", freezeOnBlur: true }}>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(root)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Stack screenOptions={{ animation: "fade", freezeOnBlur: true }}>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(root)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </GestureHandlerRootView>
       </SearchProvider>
     </SessionProvider>
   );

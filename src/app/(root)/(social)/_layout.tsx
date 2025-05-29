@@ -14,7 +14,6 @@ const Layout = () => {
           <Stack.Screen name="create-post" options={{ headerShown: false }} />
           <Stack.Screen name="update-status" options={{ headerShown: false }} />
           <Stack.Screen name="my-posts" options={{ headerShown: false }} />
-          <Stack.Screen name="vibe" options={{ headerShown: false }} />
         </Stack>
       </View>
     </SafeAreaView>

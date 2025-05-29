@@ -5,16 +5,9 @@ import profile from "assets/icons/profile.png";
 import search from "assets/icons/search.png";
 import phone from "assets/icons/phone.png";
 import lock from "assets/icons/lock.png";
-import gpt from "assets/icons/gpt.png";
 import getStarted from "assets/images/get-started.png";
-import onboarding1 from "assets/images/onboarding1.png";
-import onboarding2 from "assets/images/onboarding2.png";
-import onboarding3 from "assets/images/onboarding3.png";
 
 export const images = {
-  onboarding1,
-  onboarding2,
-  onboarding3,
   getStarted,
 };
 
@@ -26,38 +19,6 @@ export const icons = {
   search,
   phone,
   lock,
-  gpt,
-};
-
-export const onboarding = [
-  {
-    id: 1,
-    title: "Feel the vibe",
-    description:
-      "See what people near you are thinking about and feeling.",
-    image: images.onboarding1,
-    className: "mt-16 h-[400px]",
-  },
-  {
-    id: 2,
-    title: "Meet new friends",
-    description:
-      "Find your people. See locations of high app activity.",
-    image: images.onboarding2,
-    className: "mt-16 h-[400px]",
-  },
-  {
-    id: 3,
-    title: "Stay safe",
-    description:
-      "Choose to hide your identity from other users or make private groups.",
-    image: images.onboarding3,
-    className: "mt-16 h-[400px]",
-  },
-];
-
-export const data = {
-  onboarding,
 };
 
 export const calculateAge = (birthdayStr: string) => {

@@ -39,7 +39,7 @@ const Settings = () => {
         await clearAsyncStorage(userMetadata.id);
       }
       await supabase.auth.signOut();
-      router.replace("/(auth)/welcome");
+      router.replace("/(auth)/sign-in");
     } else {
       setSureLogout(true);
     }
@@ -51,7 +51,7 @@ const Settings = () => {
       await clearAsyncStorage(user.id);
       await supabase.rpc('delete_user');
       await supabase.auth.signOut();
-      router.replace("/(auth)/welcome");
+      router.replace("/(auth)/sign-in");
       setShowDeleteModal(false);
     }
   };

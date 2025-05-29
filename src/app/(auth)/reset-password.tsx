@@ -128,7 +128,7 @@ const ResetPassword = () => {
                   placeholderTextColor="#9CA3AF"
                   style={{
                     fontFamily: "font-JakartaRegular",
-                    fontSize: 18,
+                    fontSize: 14,
                     color: "#333",
                     paddingVertical: 8,
                     textAlignVertical: 'center'
@@ -149,7 +149,7 @@ const ResetPassword = () => {
                   placeholderTextColor="#9CA3AF"
                   style={{
                     fontFamily: "font-JakartaRegular",
-                    fontSize: 18,
+                    fontSize: 14,
                     color: "#333",
                     paddingVertical: 8,
                     textAlignVertical: 'center'

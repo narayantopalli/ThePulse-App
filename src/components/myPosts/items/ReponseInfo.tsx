@@ -1,3 +1,4 @@
+import ReportButton from "@/components/ReportButton";
 import { Responses } from "@/types/type";
 import { getLocalImageURI } from "@/utils/getImage";
 import { supabase } from "@/utils/supabase";
@@ -83,9 +84,12 @@ const ReponseInfo = ({
             Response: {item.response}
           </Text>
         </View>
-        <Text className="text-gray-400 text-xs">
-          {new Date(item.created_at).toLocaleDateString()}
-        </Text>
+        <View className="items-end justify-center">
+          <Text className="text-gray-400 text-xs mb-1">
+            {new Date(item.created_at).toLocaleDateString()}
+          </Text>
+          <ReportButton id={item.id} type="response" />
+        </View>
       </View>
     );
   };

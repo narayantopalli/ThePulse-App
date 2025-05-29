@@ -44,7 +44,7 @@ export default function Profile() {
           [
             {
               text: "Camera",
-              onPress: () => router.push({pathname: "(root)/camera", params: { path: "/(root)/(tabs)/profile" }})
+              onPress: () => router.push({pathname: "(root)/camera", params: { path: "/(root)/(tabs)/profile", returnPath: "/(root)/(tabs)/profile" }})
             },
             {
               text: "Photo Library", 
@@ -57,14 +57,18 @@ export default function Profile() {
       if (source === "library") {
         const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [1, 1],
           quality: 0.9,
           exif: false,
         });
 
-        if (!result.canceled && userMetadata?.id) {
-          updateProfilePhoto(result);
+        if (!result.canceled && result.assets?.[0]?.uri) {
+        router.push({
+          pathname: "/crop-photo",
+          params: {
+              newPhotoUri: result.assets?.[0]?.uri,
+              path: "/(root)/(tabs)/profile"
+            }
+          });
         }
       }
     } else {
@@ -83,7 +87,6 @@ export default function Profile() {
           isOwnProfile={true}
           profilePhotoURL={profilePhotoURL || undefined}
         />
-        <ProfileBio isOwnProfile={true} />
         
         {/* Status Section */}
         <View className="px-4 py-4">

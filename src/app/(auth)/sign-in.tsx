@@ -50,8 +50,8 @@ const SignIn = () => {
             router.replace({
               pathname: "/(auth)/setup",
               params: {
-                firstname: `${credential.fullName?.givenName}`,
-                lastname: `${credential.fullName?.familyName}`
+                firstname: `${credential.fullName?.givenName || ""}`,
+                lastname: `${credential.fullName?.familyName || ""}`
               },
             });
           }
@@ -191,7 +191,7 @@ const SignIn = () => {
                     onSubmitEditing={() => passwordInputRef.current?.focus()}
                     style={{
                       fontFamily: "font-JakartaRegular",
-                      fontSize: 18,
+                      fontSize: 14,
                       color: "#333",
                       paddingVertical: 8,
                       textAlignVertical: 'center'
@@ -214,7 +214,7 @@ const SignIn = () => {
                     onSubmitEditing={handleEmailSignIn}
                     style={{
                       fontFamily: "font-JakartaRegular",
-                      fontSize: 18,
+                      fontSize: 14,
                       color: "#333",
                       paddingVertical: 8,
                       textAlignVertical: 'center'
