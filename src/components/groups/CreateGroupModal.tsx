@@ -9,6 +9,7 @@ const CreateGroupModal = ({ visible, onClose, onGroupCreated }: CreateGroupModal
   const [isCreating, setIsCreating] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>();
   const { userMetadata } = useSession();
 
   const handleCreateGroup = async () => {
@@ -20,7 +21,8 @@ const CreateGroupModal = ({ visible, onClose, onGroupCreated }: CreateGroupModal
       .insert({ 
         name: newGroupName,
         anonymous: !isPrivate && isAnonymous,
-        private: isPrivate
+        private: isPrivate,
+        avatar_url: avatarUrl
       })
       .select();
 
@@ -37,7 +39,8 @@ const CreateGroupModal = ({ visible, onClose, onGroupCreated }: CreateGroupModal
         size: 1,
         created_at: new Date().toISOString(),
         anonymous: !isPrivate && isAnonymous,
-        private: isPrivate
+        private: isPrivate,
+        avatar_url: avatarUrl
       };
       onGroupCreated(newGroup);
     }
@@ -46,6 +49,7 @@ const CreateGroupModal = ({ visible, onClose, onGroupCreated }: CreateGroupModal
     setNewGroupName('');
     setIsAnonymous(false);
     setIsPrivate(false);
+    setAvatarUrl(undefined);
     setIsCreating(false);
   };
 

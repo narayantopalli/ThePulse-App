@@ -1,4 +1,4 @@
-import ReportButton from "@/components/ReportButton";
+import ReportButton from "@/components/buttons/ReportButton";
 import { Responses } from "@/types/type";
 import { getLocalImageURI } from "@/utils/getImage";
 import { supabase } from "@/utils/supabase";

@@ -19,6 +19,7 @@ const GroupDetailsModal = ({ visible, onClose, group, numRequests = 0, setNumReq
   const [hasMore, setHasMore] = useState(true);
   const [initialLoading, setInitialLoading] = useState(false);
   const [processingRequest, setProcessingRequest] = useState<string | null>(null);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const ITEMS_PER_PAGE = 10;
   const { userMetadata } = useSession();
 
@@ -228,6 +229,26 @@ const GroupDetailsModal = ({ visible, onClose, group, numRequests = 0, setNumReq
     }
   };
 
+  const handleAvatarChange = async (newAvatarUrl: string) => {
+    if (!group) return;
+    setIsUpdatingAvatar(true);
+    try {
+      const { error } = await supabase
+        .from('groups')
+        .update({ avatar_url: newAvatarUrl })
+        .eq('id', group.id);
+
+      if (error) throw error;
+
+      // Update the group object with the new avatar URL
+      group.avatar_url = newAvatarUrl;
+    } catch (error) {
+      console.error('Error updating group avatar:', error);
+    } finally {
+      setIsUpdatingAvatar(false);
+    }
+  };
+
   const renderFooter = () => {
     if (!loading) return null;
     return (
@@ -371,35 +392,40 @@ const GroupDetailsModal = ({ visible, onClose, group, numRequests = 0, setNumReq
     <Modal
       visible={visible}
       transparent={true}
-      animationType="fade"
+      animationType="slide"
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] max-h-[50%] flex-1">
-          <Text className="text-xl font-JakartaSemiBold mb-4">
-            {activeTab === 'members' ? `Members of ${group?.name}` : 'Join Requests'}
-          </Text>
+      <View className="flex-1 justify-start items-center bg-black/50 pt-72">
+        <View className="w-[90%] h-[50%] max-w-md bg-white rounded-2xl p-6 shadow-xl">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-2xl font-JakartaSemiBold text-gray-900">
+              {group?.name}
+            </Text>
+            <TouchableOpacity onPress={onClose}>
+              <MaterialCommunityIcons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
 
-          {group?.private && (
-            <View className="flex-row mb-4 border-b border-gray-200">
-              <TouchableOpacity
-                onPress={() => setActiveTab('members')}
-                className={`flex-1 py-2 ${activeTab === 'members' ? 'border-b-2 border-blue-500' : ''}`}
-              >
-                <Text className={`text-center font-JakartaMedium ${activeTab === 'members' ? 'text-blue-500' : 'text-gray-500'}`}>
-                  Members
-                </Text>
-              </TouchableOpacity>
+          <View className="flex-row border-b border-gray-200 mb-4">
+            <TouchableOpacity
+              onPress={() => setActiveTab('members')}
+              className={`flex-1 py-3 ${activeTab === 'members' ? 'border-b-2 border-indigo-500' : ''}`}
+            >
+              <Text className={`text-center font-medium ${activeTab === 'members' ? 'text-indigo-500' : 'text-gray-500'}`}>
+                Members
+              </Text>
+            </TouchableOpacity>
+            {group?.private && (
               <TouchableOpacity
                 onPress={() => setActiveTab('requests')}
-                className={`flex-1 py-2 ${activeTab === 'requests' ? 'border-b-2 border-blue-500' : ''}`}
+                className={`flex-1 py-3 ${activeTab === 'requests' ? 'border-b-2 border-indigo-500' : ''}`}
               >
                 <View className="flex-row items-center justify-center">
-                  <Text className={`text-center font-JakartaMedium ${activeTab === 'requests' ? 'text-blue-500' : 'text-gray-500'}`}>
+                  <Text className={`text-center font-medium ${activeTab === 'requests' ? 'text-indigo-500' : 'text-gray-500'}`}>
                     Requests
                   </Text>
                   {numRequests > 0 && (
-                    <View className="ml-2 bg-red-500 rounded-full items-center justify-center w-6 h-6">
+                    <View className="ml-2 bg-red-500 rounded-full px-2 py-0.5">
                       <Text className="text-white text-xs font-JakartaSemiBold">
                         {numRequests > 99 ? '99+' : numRequests}
                       </Text>
@@ -407,8 +433,8 @@ const GroupDetailsModal = ({ visible, onClose, group, numRequests = 0, setNumReq
                   )}
                 </View>
               </TouchableOpacity>
-            </View>
-          )}
+            )}
+          </View>
 
           {initialLoading ? (
             <View className="flex-1 justify-center items-center">

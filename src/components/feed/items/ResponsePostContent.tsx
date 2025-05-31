@@ -109,8 +109,9 @@ const ResponsePostContent = ({ caption, user_id, postId, inputRefs, onFocus }: R
                 placeholder="Write your response..."
                 placeholderTextColor="#9CA3AF"
                 autoCapitalize="sentences"
-                autoComplete="off"
                 autoCorrect={true}
+                autoComplete="off"
+                spellCheck={true}
                 multiline
                 value={response}
                 onChangeText={(text) => {

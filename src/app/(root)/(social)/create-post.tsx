@@ -17,12 +17,13 @@ import SmallProfilePhoto from "@/components/smallProfilePhoto";
 type PostType = 'text' | 'poll' | 'response';
 
 const CreatePost = () => {
-  const { newPhotoUri, caption: savedCaption, postType: savedPostType, pollOptions: savedPollOptions } = useLocalSearchParams();
+  const { newPhotoUri, data } = useLocalSearchParams();
+  const parsedData = data ? JSON.parse(data as string) : {};
   const { userMetadata, setUserMetadata, location, isAnonymous, channel, forceAnonymous } = useSession();
   const [postPhoto, setPostPhoto] = useState<string | null>(newPhotoUri ? newPhotoUri as string : null);
-  const [postType, setPostType] = useState<PostType>(savedPostType as PostType || 'text');
-  const [caption, setCaption] = useState(savedCaption as string || "");
-  const [pollOptions, setPollOptions] = useState(savedPollOptions ? JSON.parse(savedPollOptions as string) : ['', '']);
+  const [postType, setPostType] = useState<PostType>(parsedData.postType || 'text');
+  const [caption, setCaption] = useState(parsedData.caption || "");
+  const [pollOptions, setPollOptions] = useState(parsedData.pollOptions ? JSON.parse(parsedData.pollOptions) : ['', '']);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [visibilityDistance, setVisibilityDistance] = useState<number>(4828);
   const [postAnonymous, setPostAnonymous] = useState<boolean>(isAnonymous);
@@ -53,9 +54,11 @@ const CreatePost = () => {
                   path: "/(root)/(social)/create-post", 
                   returnPath: "/(root)/(social)/create-post",
                   aspectRatio: "3:4",
-                  caption: caption,
-                  postType: postType,
-                  pollOptions: JSON.stringify(pollOptions)
+                  data: JSON.stringify({
+                    caption: caption,
+                    postType: postType,
+                    pollOptions: JSON.stringify(pollOptions)
+                  })
                 }
               })
             },
@@ -129,7 +132,7 @@ const CreatePost = () => {
       <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
         <BackButton onPress={() => router.replace("/(root)/(tabs)/home")} />
         <Text className="text-xl font-JakartaBold flex-1 text-center">Create Post</Text>
-          <View className="border-2 border-black rounded-full overflow-hidden">
+          <View className="rounded-full overflow-hidden">
             <SmallProfilePhoto isAnonymous={postAnonymous}/>
           </View>
       </View>

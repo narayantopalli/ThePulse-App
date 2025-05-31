@@ -60,9 +60,9 @@ const VisibilityRadiusButton = ({ searchRadius, setSearchRadius }: VisibilityRad
         >
           <View className="flex-1 justify-center items-center bg-black/50">
             <View className="bg-white rounded-2xl p-6 w-[90%] max-w-[400px] max-h-[20%] flex-1">
-              <Text className="text-xl font-JakartaSemiBold mb-4">Search Radius</Text>
+              <Text className="text-xl font-JakartaSemiBold mb-4">Visibility Radius</Text>
               <View className="flex-row items-center justify-between mb-2">
-                <Text className="text-gray-600">Limit search to:</Text>
+                <Text className="text-gray-600">Limit visibility to:</Text>
                 <Text className="text-gray-700 font-JakartaMedium">
                   {getVisibilityText(tempRadius)}
                 </Text>

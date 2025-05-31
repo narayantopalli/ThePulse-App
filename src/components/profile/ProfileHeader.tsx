@@ -140,7 +140,7 @@ const ProfileHeader = ({
             </Text>
           )}
           <Text numberOfLines={1} adjustsFontSizeToFit={true} minimumFontScale={0.5} className="text-gray-500 text-sm mt-2">
-            {`Last active ${formatLastActive(userMetadata?.last_posted).toLowerCase()}`}
+            {`Last active ${formatLastActive(userMetadata?.last_active).toLowerCase()}`}
           </Text>
         </View>
         <View className="flex-1 ml-8">

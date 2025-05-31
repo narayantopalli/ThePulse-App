@@ -7,7 +7,7 @@ export interface User {
   pronouns: string;
   bio: string;
   avatar_url: string;
-  last_posted: string;
+  last_active: string;
 }
 
 export interface UserMetadata {
@@ -18,7 +18,7 @@ export interface UserMetadata {
   pronouns: string;
   bio: string;
   avatar_url: string;
-  last_posted: string;
+  last_active: string;
   words_left: number;
   current_score: number;
   current_ranking: number;
@@ -271,6 +271,8 @@ interface SessionContextType {
   groupRequests: any[];
   setGroupRequests: (value: any[]) => void;
   locationString: string;
+  showVibe: boolean;
+  setShowVibe: (value: boolean) => void;
 }
 
 // Friendship Types
@@ -306,6 +308,7 @@ export interface Group {
   created_at: string;
   anonymous: boolean;
   private: boolean;
+  avatar_url?: string;
 }
 
 export interface GroupMember {
@@ -328,12 +331,13 @@ export interface GroupItemProps {
 
 export interface SearchResultsProps {
   groups: Group[];
+  users: User[];
   onEndReached: () => void;
   onRefresh: () => void;
   refreshing: boolean;
-  setRefreshing: (refreshing: boolean) => void;
   groupRequests: Group[];
   setGroupRequests: (value: Group[]) => void;
+  showCreateButton?: boolean;
 }
 
 export interface CreateGroupModalProps {

@@ -56,6 +56,8 @@ const SessionContext = createContext<SessionContextType>({
   groupRequests: [],
   setGroupRequests: () => {},
   locationString: "",
+  showVibe: false,
+  setShowVibe: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -82,6 +84,7 @@ export const SessionProvider = ({ children }: Props) => {
   const [channel, setChannel] = useState<string>('00000000-0000-0000-0000-000000000000');
   const [forceAnonymous, setForceAnonymous] = useState<boolean>(false);
   const [locationString, setLocationString] = useState<string>("Location not available");
+  const [showVibe, setShowVibe] = useState<boolean>(false);
 
   useEffect(() => {
     AsyncStorage.getItem('channel').then((channel) => {
@@ -89,6 +92,27 @@ export const SessionProvider = ({ children }: Props) => {
     });
     AsyncStorage.getItem('forceAnonymous').then((forceAnonymous) => {
       if (forceAnonymous) setForceAnonymous(forceAnonymous === 'true');
+    });
+    AsyncStorage.getItem('vibeLastShown').then(async (vibeLastShown) => {
+      let diffDays = 1;
+      const now = new Date();
+      if (vibeLastShown) {
+        const lastShown = new Date(vibeLastShown);
+        const diffTime = Math.abs(now.getTime() - lastShown.getTime());
+        diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      }
+      if (diffDays > 0) setShowVibe(true);
+      AsyncStorage.setItem('vibeLastShown', now.toISOString());
+
+      // Update last active
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ last_active: now.toISOString() })
+        .eq("id", userMetadata?.id);
+      if (profileError) throw profileError;
+      if (userMetadata) {
+        setUserMetadata({...userMetadata, last_active: now.toISOString()});
+      }
     });
   }, []);
 
@@ -317,7 +341,7 @@ export const SessionProvider = ({ children }: Props) => {
 
     await cacheImage(uri).then((localPath) => {
         setPhotoURL(localPath);
-        AsyncStorage.setItem(uri, localPath); // persist
+        AsyncStorage.setItem(uri, localPath || ""); // persist
       })
       .catch(console.error);
 
@@ -373,6 +397,8 @@ export const SessionProvider = ({ children }: Props) => {
         groupRequests,
         setGroupRequests,
         locationString,
+        showVibe,
+        setShowVibe,
       }}
     >
       {children}

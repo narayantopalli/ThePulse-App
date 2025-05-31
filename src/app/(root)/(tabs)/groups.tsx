@@ -1,72 +1,81 @@
-import { Keyboard, TouchableWithoutFeedback, View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import BackButton from "@/components/buttons/backButton";
-import { SafeAreaView } from "react-native-safe-area-context";
-import SmallProfilePhoto from "@/components/smallProfilePhoto";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
-import SearchForm from "@/components/groups/searchForm";
-import { supabase } from "@/utils/supabase";
 import SearchResults from "@/components/groups/searchResults";
 import { useSession } from "@/contexts/SessionContext";
-import { loadGroupRequestsFromDatabase, loadGroupRequestsFromLocalStorage, loadMyGroupsFromDatabase, loadMyGroupsFromLocalStorage } from "@/utils/loadGroups";
+import { loadGroupRequestsFromDatabase, loadMyGroupsFromDatabase } from "@/utils/loadGroups";
 import { Group } from "@/types/type";
 import { useSearch } from "@/contexts/SearchContext";
+import { getLocalImageURI } from "@/utils/getImage";
+import { supabase } from "@/utils/supabase";
+
+type TabType = 'tribes' | 'people';
 
 const Groups = () => {
-  const { userMetadata, myGroups, setMyGroups, groupRequests, setGroupRequests } = useSession();
+  const { userMetadata, setMyGroups, groupRequests, setGroupRequests } = useSession();
   const { query, setQuery } = useSearch();
   const [groups, setGroups] = useState<Group[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('tribes');
   const DEFAULT_ITEMS_PER_PAGE = 10;
 
-  const searchGroups = async (searchQuery: string, pageNum: number = 0) => {
-    let ITEMS_PER_PAGE = DEFAULT_ITEMS_PER_PAGE;
-
-    // Reduces the number of database queries by checking if the group is a match before querying the database
-    for (let group of groups) {
-      if (group.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-        ITEMS_PER_PAGE--;
-      } else {
-        groups.splice(groups.indexOf(group), 1);
-      }
-    }
+  const searchPeople = async (searchQuery: string, pageNum: number = 0) => {
     try {
-      // Get groups the user is a member of
-      let typedUserGroups: Group[] = [];
-      if (myGroups[0] == null) {
-        typedUserGroups = [];
-      } else {
-        typedUserGroups = (myGroups || []) as unknown as Group[];
-      }
-
-      // Get groups the user is requesting to join
-      if (groupRequests[0] != null) {
-        typedUserGroups = [...typedUserGroups, ...(groupRequests || []) as unknown as Group[]];
-      }
-      typedUserGroups = typedUserGroups.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      const userGroupIds = typedUserGroups.map(g => g.id).join(',') || '';
-    
-      // Then get other groups
-      const { data: otherGroups, error: otherGroupsError } = await supabase
-        .from('groups')
-        .select('*')
-        .ilike('name', `%${searchQuery}%`)
-        .not('id', 'in', `(${userGroupIds})`)
-        .range(pageNum * ITEMS_PER_PAGE, (pageNum + 1) * ITEMS_PER_PAGE - 1)
-        .order('size', { ascending: false });
-
-      if (otherGroupsError) throw otherGroupsError;
-
-      const allGroups = [...typedUserGroups, ...(otherGroups as Group[])];
-      
-      setGroups(prev => {
-        if (pageNum === 0) return allGroups;
-        return [...prev, ...allGroups.filter(group => !prev.some(prevGroup => prevGroup.id === group.id))];
+      const { data, error } = await supabase.rpc("search_people", {
+        p_search: searchQuery.trim(),
+        p_page:   pageNum,
+        p_limit:  DEFAULT_ITEMS_PER_PAGE,
       });
-      
-      setHasMore(!!otherGroups && otherGroups.length === ITEMS_PER_PAGE);
+
+      if (error) throw error;
+
+      const resolvedUsers = await Promise.all(
+        (data ?? []).map(async (u: any) => ({
+          id:         u.id,
+          firstname:  u.firstname,
+          lastname:   u.lastname,
+          avatar_url: await getLocalImageURI(u.avatar_url),
+          created_at: u.created_at
+        })),
+      );
+
+      setUsers(prev =>
+        pageNum === 0
+          ? resolvedUsers
+          : [
+              ...prev,
+              ...resolvedUsers.filter(r => !prev.some(p => p.id === r.id)),
+            ],
+      );
+
+      setHasMore(resolvedUsers.length === DEFAULT_ITEMS_PER_PAGE);
+    } catch (error) {
+      console.error('Error searching people:', error);
+    }
+  };
+
+  const searchGroups = async (searchQuery: string, pageNum: number = 0) => {
+    try {
+      const { data, error } = await supabase.rpc("search_groups", {
+        p_search: searchQuery.trim(),
+        p_user:   userMetadata?.id,
+        p_page:   pageNum,
+        p_limit:  DEFAULT_ITEMS_PER_PAGE,
+      });
+      if (error) throw error;
+  
+      setGroups(prev =>
+        pageNum === 0
+          ? data
+          : [
+              ...prev,
+              ...data.filter((r: any) => !prev.some(p => p.id === r.id)),
+            ],
+      );
+  
+      setHasMore(data.length === DEFAULT_ITEMS_PER_PAGE);
     } catch (error) {
       console.error('Error searching groups:', error);
     }
@@ -75,17 +84,21 @@ const Groups = () => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setPage(0);
-      searchGroups(query, 0);
+      if (activeTab === 'tribes') {
+        searchGroups(query, 0);
+      } else {
+        searchPeople(query, 0);
+      }
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query]);
+  }, [query, activeTab]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     if (userMetadata?.id) {
       await Promise.all([
-        searchGroups(query, 0),
+        activeTab === 'tribes' ? searchGroups(query, 0) : searchPeople(query, 0),
         loadMyGroupsFromDatabase(userMetadata.id, setMyGroups),
         loadGroupRequestsFromDatabase(userMetadata.id, setGroupRequests)
       ]);
@@ -97,7 +110,11 @@ const Groups = () => {
     if (hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
-      searchGroups(query, nextPage);
+      if (activeTab === 'tribes') {
+        searchGroups(query, nextPage);
+      } else {
+        searchPeople(query, nextPage);
+      }
     }
   };
 
@@ -108,18 +125,42 @@ const Groups = () => {
     }
     setQuery("");
   }, [userMetadata?.id]);
+
+  const renderTabButton = (tab: TabType, label: string) => (
+    <TouchableOpacity
+      onPress={() => {
+        setActiveTab(tab);
+        setPage(0);
+        if (tab === 'tribes') {
+          searchGroups(query, 0);
+        } else {
+          searchPeople(query, 0);
+        }
+      }}
+      className={`flex-1 py-3 ${activeTab === tab ? 'border-b-2 border-indigo-500' : ''}`}
+    >
+      <Text className={`text-center font-medium ${activeTab === tab ? 'text-indigo-500' : 'text-gray-500'}`}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
   
   return (
     <View className="flex-1 bg-general-300">
+      <View className="flex-row border-b border-gray-200 bg-white">
+        {renderTabButton('tribes', 'Tribes')}
+        {renderTabButton('people', 'People')}
+      </View>
       <View className="flex-1">
         <SearchResults 
-          groups={groups} 
+          groups={activeTab === 'tribes' ? groups : []} 
+          users={activeTab === 'people' ? users : []}
           onEndReached={loadMore}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          setRefreshing={setRefreshing}
           groupRequests={groupRequests}
           setGroupRequests={setGroupRequests}
+          showCreateButton={activeTab === 'tribes'}
         />
       </View>
     </View>

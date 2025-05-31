@@ -9,7 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const Camera = () => {
-  const { path, returnPath, aspectRatio = "1:1", caption, postType, pollOptions } = useLocalSearchParams<{ path: string, returnPath: string, aspectRatio: string, caption: string, postType: string, pollOptions: string[] }>();
+  const { path, returnPath, aspectRatio = "1:1", data } = useLocalSearchParams<{ path: string, returnPath: string, aspectRatio: string, data: string }>();
   const [facing, setFacing] = useState<CameraType>('front');
   const [flash, setFlash] = useState<FlashMode>('auto');
   const [permission, requestPermission] = useCameraPermissions();
@@ -95,9 +95,7 @@ const Camera = () => {
             path: path as any,
             returnPath: returnPath as any,
             aspectRatio: aspectRatio as any,
-            caption: caption,
-            postType: postType,
-            pollOptions: pollOptions
+            data: data as any
           }
         });
       } catch (error) {

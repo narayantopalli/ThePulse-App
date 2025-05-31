@@ -1,20 +1,16 @@
 import { View, ScrollView, Text } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useState, useEffect } from "react";
-import { useSession } from "@/contexts/SessionContext";
 import { supabase } from "@/utils/supabase";
 import { getLocalImageURI } from "@/utils/getImage";
 import Status from "@/components/status";
 import ProfileHeader from "@/components/profile/ProfileHeader";
-import ProfileBio from "@/components/profile/ProfileBio";
-import AnonymousToggle from "@/components/AnonymousToggle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/buttons/backButton";
 import SmallProfilePhoto from "@/components/smallProfilePhoto";
 
 const PublicProfile = () => {
   const { userID } = useLocalSearchParams<{ userID: string }>();
-  const { isAnonymous, setIsAnonymous } = useSession();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [localProfilePhotoURL, setLocalProfilePhotoURL] = useState("");
@@ -65,7 +61,7 @@ const PublicProfile = () => {
     <View className="flex-1 bg-gradient-to-b from-general-300 to-general-200">
       <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
         <BackButton onPress={() => router.back()} />
-        <View className="border-2 border-black rounded-full overflow-hidden">
+        <View className="rounded-full overflow-hidden">
           <SmallProfilePhoto />
         </View>
       </View>
@@ -77,7 +73,7 @@ const PublicProfile = () => {
             lastname: user.lastname,
             birthday: user.birthday,
             pronouns: user.pronouns,
-            last_posted: user.last_posted,  
+            last_active: user.last_active,  
             avatar_url: user.avatar_url,
             bio: user.bio,
             words_left: user.words_left,

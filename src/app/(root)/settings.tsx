@@ -1,7 +1,6 @@
-import { View, ScrollView, TouchableOpacity, Text, Modal, Pressable, Alert } from "react-native";
+import { View, ScrollView, TouchableOpacity, Text, Modal } from "react-native";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import NiceButton from "@/components/buttons/niceButton";
 import BackButton from "@/components/buttons/backButton";
 import { supabase } from "@/utils/supabase";
 import SmallProfilePhoto from "@/components/smallProfilePhoto";

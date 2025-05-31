@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "@/components/buttons/backButton";
 import { Ionicons } from '@expo/vector-icons';
 
+const MAX_CHARS = 100;
+
 const BioEdit = () => {
   const { userMetadata, setUserMetadata } = useSession();
   const [bio, setBio] = useState(userMetadata?.bio || "");
@@ -17,6 +19,15 @@ const BioEdit = () => {
       inputRef.current?.focus();
     }, 100);
   }, []);
+
+  const handleBioChange = (text: string) => {
+    // Only remove enters and tabs, keep spaces
+    const cleanedText = text.replace(/[\r\n\t]/g, '').slice(0, MAX_CHARS);
+    
+    if (cleanedText.length <= MAX_CHARS) {
+      setBio(cleanedText);
+    }
+  };
 
   const OnConfirm = async () => {
     if (userMetadata?.id) {
@@ -54,7 +65,7 @@ const BioEdit = () => {
               value={bio}
               autoCorrect={true}
               autoCapitalize="sentences"
-              onChangeText={setBio}
+              onChangeText={handleBioChange}
               style={{
                 fontFamily: "font-JakartaRegular",
                 fontSize: 18,
@@ -63,6 +74,9 @@ const BioEdit = () => {
                 textAlignVertical: 'center'
               }}
             />
+            <Text className="text-gray-400 text-sm font-JakartaMedium mt-2 text-right">
+              {bio.length}/{MAX_CHARS} characters
+            </Text>
           </View>
 
           <View className="mt-8">

@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePathname } from "expo-router";
 

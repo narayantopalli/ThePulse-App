@@ -1,16 +1,23 @@
-import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, Pressable, TouchableOpacity } from "react-native";
+import React from 'react';
+import { View, Text, FlatList, ActivityIndicator, RefreshControl, Modal, Pressable, TouchableOpacity, Image } from "react-native";
 import { useState } from "react";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
-import GroupItem from "./GroupItem";
-import CreateGroupModal from "./CreateGroupModal";
-import GroupListHeader from "./GroupListHeader";
-import { Group, SearchResultsProps } from '@/types/type';
+import GroupItem from "@/components/groups/GroupItem";
+import CreateGroupModal from "@/components/groups/CreateGroupModal";
+import GroupListHeader from "@/components/groups/GroupListHeader";
+import { Group, SearchResultsProps, User } from '@/types/type';
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import GroupDetailsModal from "./GroupDetailsModal";
+import GroupDetailsModal from "@/components/groups/GroupDetailsModal";
+import UserItem from "@/components/groups/UserItem";
 
-const SearchResults = ({ groups, onEndReached, onRefresh, refreshing, setRefreshing, groupRequests, setGroupRequests }: SearchResultsProps) => {
+type SearchItem = {
+  type: 'group' | 'user';
+  item: Group | User;
+};
+
+const SearchResults = ({ groups, users = [], onEndReached, onRefresh, refreshing, groupRequests, setGroupRequests, showCreateButton = true }: SearchResultsProps) => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -107,15 +114,55 @@ const SearchResults = ({ groups, onEndReached, onRefresh, refreshing, setRefresh
     );
   };
 
+  const renderUserItem = ({ item }: { item: User }) => (
+    <TouchableOpacity 
+      onPress={() => router.push(item.id === userMetadata?.id? `/profile`: `(root)/(social)/public-profile?userID=${item.id}`)}
+      className="bg-white rounded-lg p-4 flex-row items-center"
+    >
+      <UserItem item={item} />
+    </TouchableOpacity>
+  );
+
+  const renderGroupItem = ({ item }: { item: Group }) => (
+    <TouchableOpacity onPress={() => {}}>
+      <GroupItem
+        item={item}
+        isMember={myGroups.some(group => group.id === item.id)}
+        isRequestingJoin={groupRequests.some(group => group.id === item.id)}
+        onJoin={() => handleJoin(item.id)}
+        onLeave={(groupId, isRequestingJoin) => handleLeavePress(groupId, isRequestingJoin)}
+        onShowMembers={handleShowMembers}
+        numRequests={item.private ? (requestsMap[item.id] || 0) : 0}
+        setNumRequests={(value) => updateGroupRequests(item.id, value)}
+      />
+    </TouchableOpacity>
+  );
+
+  const renderItem = ({ item }: { item: SearchItem }) => {
+    if (item.type === 'user') {
+      return renderUserItem({ item: item.item as User });
+    }
+    return renderGroupItem({ item: item.item as Group });
+  };
+
+  const searchItems: SearchItem[] = [
+    ...users.map((user: User) => ({ type: 'user' as const, item: user })),
+    ...groups.map((group: Group) => ({ type: 'group' as const, item: group }))
+  ];
+
   return (
     <View className="flex-1 bg-general-300">
       <FlatList
-        data={groups}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+        data={searchItems}
+        keyExtractor={(item) => item.item.id}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, paddingBottom: 200 }}
         onEndReached={onEndReached}
         onEndReachedThreshold={0.5}
-        ListHeaderComponent={<GroupListHeader onCreatePress={() => setIsCreateModalVisible(true)} />}
+        ListHeaderComponent={
+          showCreateButton ? (
+            <GroupListHeader onCreatePress={() => setIsCreateModalVisible(true)} />
+          ) : null
+        }
         ListFooterComponent={renderFooter}
         ItemSeparatorComponent={() => <View className="h-4" />}
         refreshControl={
@@ -126,25 +173,12 @@ const SearchResults = ({ groups, onEndReached, onRefresh, refreshing, setRefresh
             tintColor="#000000"
           />
         }
+        renderItem={renderItem}
         ListEmptyComponent={() => (
           <View className="flex-1 items-center justify-center py-16">
-            <Text className="text-gray-500 text-lg">No available groups</Text>
+            <Text className="text-gray-500 text-lg">No results found</Text>
             <Text className="text-gray-400 text-sm mt-2">Swipe down to refresh</Text>
           </View>
-        )}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => {}}>
-            <GroupItem
-              item={item}
-              isMember={myGroups.some(group => group.id === item.id)}
-              isRequestingJoin={groupRequests.some(group => group.id === item.id)}
-              onJoin={() => handleJoin(item.id)}
-              onLeave={(groupId, isRequestingJoin) => handleLeavePress(groupId, isRequestingJoin)}
-              onShowMembers={handleShowMembers}
-              numRequests={item.private ? (requestsMap[item.id] || 0) : 0}
-              setNumRequests={(value) => updateGroupRequests(item.id, value)}
-            />
-          </TouchableOpacity>
         )}
       />
       

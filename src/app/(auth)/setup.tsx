@@ -1,12 +1,8 @@
 import React, { useState } from "react";
-import { images } from "@/constants";
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, View, Image, TouchableOpacity, Keyboard, Alert, TextInput, Platform } from "react-native";
-import { icons } from "@/constants";
-import NiceButton from "@/components/buttons/niceButton";
+import { Text, View, TouchableOpacity, Keyboard, Alert, TextInput, Platform } from "react-native";
 import { supabase } from "@/utils/supabase";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import PronounsOption from "@/components/buttons/pronounsOption";
 import { useSession } from "@/contexts/SessionContext";
 import ProfilePhoto from "@/components/profilePhoto";
 import * as ImagePicker from "expo-image-picker";
@@ -21,7 +17,8 @@ const Setup = () => {
     firstname: firstname ? String(firstname) : "",
     lastname: lastname ? String(lastname) : "",
     birthday: new Date(),
-    pronouns: ""
+    pronouns: "",
+    bio: ""
   });
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
@@ -108,6 +105,7 @@ const Setup = () => {
       lastname: form.lastname,
       birthday: formatDateToYYYYMMDD(form.birthday),
       pronouns: form.pronouns,
+      bio: form.bio,
     }).eq('id', userMetadata?.id)
 
     setUserMetadata({
@@ -116,6 +114,7 @@ const Setup = () => {
       lastname: form.lastname,
       birthday: formatDateToYYYYMMDD(form.birthday),
       pronouns: form.pronouns,
+      bio: form.bio,
     });
 
     if (profilePhoto) {
@@ -135,6 +134,17 @@ const Setup = () => {
     if (error) return setError(error.message);
 
     router.replace("/(root)/(tabs)/home");
+  };
+
+  const MAX_CHARS = 100;
+
+  const handleBioChange = (text: string) => {
+    // Only remove enters and tabs, keep spaces
+    const cleanedText = text.replace(/[\r\n\t]/g, '').slice(0, MAX_CHARS);
+    
+    if (cleanedText.length <= MAX_CHARS) {
+      setForm({ ...form, bio: cleanedText });
+    }
   };
 
   const pickImage = async () => {
@@ -292,6 +302,32 @@ const Setup = () => {
 
           {step === 3 && (
             <>
+              <Text className="text-gray-500 font-JakartaMedium mb-4 text-sm">YOUR BIO</Text>
+              <View className="bg-white rounded-xl p-4 shadow-sm">
+                <Text className="text-gray-500 text-sm font-JakartaMedium mb-2">Tell us about yourself</Text>
+                <TextInput
+                  placeholder="Write a short bio (max 100 characters)"
+                  value={form.bio}
+                  onChangeText={handleBioChange}
+                  multiline
+                  maxLength={100}
+                  style={{ 
+                    minHeight: 100,
+                    fontFamily: "font-JakartaRegular",
+                    fontSize: 14,
+                    color: "#333",
+                    textAlignVertical: 'top'
+                  }}
+                />
+                <Text className="text-gray-400 text-xs font-JakartaRegular mt-2 text-right">
+                  {form.bio.length}/100
+                </Text>
+              </View>
+            </>
+          )}
+
+          {step === 4 && (
+            <>
               <Text className="text-gray-500 font-JakartaMedium mb-4 text-sm">PROFILE PHOTO</Text>
               <View className="bg-white rounded-xl p-6 shadow-sm items-center">
                 <Text className="text-black text-xl font-JakartaMedium mb-2 text-center">
@@ -317,11 +353,11 @@ const Setup = () => {
 
           <View className="mt-8">
             <TouchableOpacity
-              onPress={step < 3 ? handleNext : OnSignUpPress}
+              onPress={step < 4 ? handleNext : OnSignUpPress}
               className="bg-blue-500 p-4 rounded-xl shadow-sm flex-row items-center justify-center"
             >
               <Text className="text-white text-lg font-JakartaMedium">
-                {step < 3 ? "Next" : "Sign Up"}
+                {step < 4 ? "Next" : "Sign Up"}
               </Text>
             </TouchableOpacity>
           </View>

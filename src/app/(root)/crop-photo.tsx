@@ -24,13 +24,11 @@ export default function CropPhoto() {
   const [minScale, setMinScale] = useState(1);
   const MAX_SCALE = 6;
 
-  const { newPhotoUri, path, aspectRatio = '1:1', caption, postType, pollOptions } = useLocalSearchParams<{
+  const { newPhotoUri, path, aspectRatio = '1:1', data } = useLocalSearchParams<{
     newPhotoUri: string;
     path: string;
     aspectRatio: string;
-    caption?: string;
-    postType?: string;
-    pollOptions?: string;
+    data: string;
   }>();
 
   const photo = newPhotoUri;
@@ -174,9 +172,7 @@ export default function CropPhoto() {
         pathname: path as any,
         params: { 
           newPhotoUri: cropResult.uri,
-          caption: caption,
-          postType: postType,
-          pollOptions: pollOptions
+          data: data as any
         },
       });
     } catch (err) {

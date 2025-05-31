@@ -34,7 +34,7 @@ const WordInput = () => {
     const shimmerStyle = {
         backgroundColor: shimmerAnim.interpolate({
             inputRange: [0, 0.5, 1],
-            outputRange: ['#EAB308', '#FCD34D', '#EAB308'], // Different shades of yellow
+            outputRange: ['#EAB308', '#FCD34D', '#EAB308'],
         }),
     };
 
@@ -81,7 +81,7 @@ const WordInput = () => {
                 <TextInput
                     value={word}
                     onChangeText={handleWordChange}
-                    placeholder="What's your vibe?"
+                    placeholder="Your vibe in one word?"
                     className="flex-1 p-5 text-white"
                     style={{
                         fontSize: 16,

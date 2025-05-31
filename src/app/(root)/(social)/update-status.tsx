@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import NiceButton from "@/components/buttons/niceButton";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
 import { View, TextInput, TouchableOpacity, Image, Text, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from 'expo-file-system';
@@ -14,9 +12,10 @@ import BackButton from "@/components/buttons/backButton";
 import ErrorMessage from "@/components/ErrorMessage";
 
 const UpdateStatus = () => {
-  const { newPhotoUri, caption: savedCaption } = useLocalSearchParams();
+  const { newPhotoUri, data } = useLocalSearchParams();
+  const parsedData = data ? JSON.parse(data as string) : {};
   const { userMetadata, setUserMetadata, locationString } = useSession();
-  const [caption, setCaption] = useState(savedCaption as string || "");
+  const [caption, setCaption] = useState(parsedData.caption || "");
   const inputRef = useRef<TextInput>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -44,7 +43,6 @@ const UpdateStatus = () => {
       if (!uri) return;
 
       const buffer = decode(base64);
-      const last_posted = new Date().toISOString();
 
       // Upload image and create post in parallel
       const [uploadResult, postResult] = await Promise.all([
@@ -59,21 +57,12 @@ const UpdateStatus = () => {
           image_url: `statuses/${uri}`,
           caption: caption,
           location: localLocationString,
-          created_at: last_posted
+          created_at: new Date().toISOString()
         })
       ]);
 
       if (uploadResult.error) throw uploadResult.error;
       if (postResult.error) throw postResult.error;
-
-      // Update user metadata and profile
-      setUserMetadata({...userMetadata, last_posted: last_posted});
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ last_posted: last_posted })
-        .eq("id", userMetadata?.id);
-
-      if (profileError) throw profileError;
     } catch (error) {
       console.error('Error in uploadStatus:', error);
       setErrorMessage("Failed to upload status. Please try again.");
@@ -86,7 +75,7 @@ const UpdateStatus = () => {
       setIsPosting(true);
       try {
         await uploadStatus();
-        router.replace("/(root)/(tabs)/home");
+        router.replace("/(root)/(tabs)/profile");
       } catch (error) {
         console.error('Error posting:', error);
         setIsPosting(false);
@@ -103,7 +92,7 @@ const UpdateStatus = () => {
       <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
         <BackButton onPress={() => router.replace({pathname: "/(root)/camera", params: { path: "/(root)/(social)/update-status", returnPath: "/(root)/(tabs)/profile", caption: caption }})} />
         <Text className="text-xl font-JakartaBold flex-1 text-center">Update Status</Text>
-        <View className="border-2 border-black rounded-full overflow-hidden">
+        <View className="rounded-full overflow-hidden">
           <SmallProfilePhoto />
         </View>
       </View>
@@ -125,7 +114,7 @@ const UpdateStatus = () => {
             {/* Image Preview */}
             {typeof newPhotoUri === 'string' && (
               <View className="bg-white rounded-3xl shadow-sm p-2 mb-6 overflow-hidden border-2 border-yellow-500">
-                <View className="aspect-[3/4] w-[40%] self-center relative">
+                <View className="aspect-square w-[50%] self-center relative">
                   <Image 
                     source={{ uri: newPhotoUri }} 
                     className="w-full h-full rounded-xl"
@@ -171,8 +160,8 @@ const UpdateStatus = () => {
                 placeholder="What's on your mind?"
                 multiline
                 value={caption}
-                autoCorrect={false}
-                spellCheck={false}
+                autoCorrect={true}
+                spellCheck={true}
                 autoCapitalize="sentences"
                 onChangeText={setCaption}
                 maxLength={MAX_CAPTION_LENGTH}

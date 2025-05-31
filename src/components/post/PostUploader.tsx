@@ -46,7 +46,6 @@ const PostUploader = ({
             }
             setIsPosting(true);
             let uploadResult = null;
-            const last_posted = new Date().toISOString();
 
             if (postPhoto) {
                 // Start all async operations in parallel
@@ -94,15 +93,7 @@ const PostUploader = ({
 
             if (uploadResult?.error) throw uploadResult.error;
             if (postResult.error) throw postResult.error;
-
-            // Update user metadata and profile
-            setUserMetadata({...userMetadata, last_posted: last_posted});
-            const { error: profileError } = await supabase
-                .from("profiles")
-                .update({ last_posted: last_posted })
-                .eq("id", userMetadata?.id);
-
-            if (profileError) throw profileError;
+            
             setIsPosting(false);
             router.replace("/(root)/(tabs)/home");
         } catch (error) {

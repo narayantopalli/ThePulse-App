@@ -6,7 +6,7 @@ import TextPostContent from "./items/TextPostContent";
 import PollPostContent from "./items/PollPostContent";
 import ResponsePostContent from "./items/ResponsePostContent";
 import { FeedItemProps } from "@/types/type";
-import ReportButton from "../ReportButton";
+import ReportButton from "../buttons/ReportButton";
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { formatTimeAgo } from "@/hooks/formatTimeAgo";
@@ -79,7 +79,7 @@ const FeedItem = ({ post, onFocus, inputRefs }: FeedItemProps) => {
           <Image
             source={
               !post.anonymous
-                ? { uri: post.user_data.avatar_url }
+                ? { uri: post.user_data.avatar_url || "assets/images/avatar-default-icon.png"}
                 : require("assets/images/avatar-default-icon.png")
             }
             style={{

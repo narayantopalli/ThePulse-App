@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import NiceButton from "@/components/buttons/niceButton";
 import { supabase } from "@/utils/supabase";
 import { useSession } from "@/contexts/SessionContext";
 import { View, TextInput, Text } from "react-native";

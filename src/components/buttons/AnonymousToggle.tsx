@@ -17,7 +17,7 @@ const AnonymousToggle = ({ isAnonymous, setIsAnonymous }: AnonymousToggleProps) 
   return (
     <View className="flex-row items-center">
       <MaterialIcons 
-        name={effectiveIsAnonymous ? "visibility" : "visibility-off"} 
+        name={effectiveIsAnonymous ? "visibility-off" : "visibility"} 
         size={22} 
         color={effectiveIsAnonymous ? "#0095F6" : "#262626"} 
         style={{ marginRight: 2 }}
@@ -33,4 +33,4 @@ const AnonymousToggle = ({ isAnonymous, setIsAnonymous }: AnonymousToggleProps) 
   );
 };
 
-export default AnonymousToggle; 
+export default AnonymousToggle;

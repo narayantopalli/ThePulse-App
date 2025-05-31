@@ -1,20 +1,23 @@
-import { View, Text, FlatList, KeyboardAvoidingView, Platform, Keyboard, TextInput, Dimensions, RefreshControl, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, KeyboardAvoidingView, Platform, Keyboard, TextInput, Dimensions, RefreshControl, ActivityIndicator, Modal, TouchableOpacity } from "react-native";
 import { useSession } from "@/contexts/SessionContext";
 import { useState, useEffect, useRef } from "react";
 import FeedItem from "@/components/feed/FeedItem";
 import { getFeed } from "@/utils/nextFeed";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FeedHeader from "@/components/feed/FeedHeader";
+import VibeScreen from "@/components/vibe/vibeScreen";
+import { Ionicons } from '@expo/vector-icons';
 
 const POSTS_PER_PAGE = 10;
 
 const Home = () => {
-  const { feed, setFeed, session, location, searchRadius, blockedPosts, userMetadata, channel } = useSession();
+  const { feed, setFeed, session, location, searchRadius, blockedPosts, userMetadata, channel, showVibe, setShowVibe } = useSession();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isMoreFeed, setIsMoreFeed] = useState(true);
   const listRef = useRef<FlatList<any>>(null);
   const inputRefs = useRef<Record<string, TextInput | null>>({});
+  const [colorGradient, setColorGradient] = useState<string>('rgba(0,0,0,0.0)');
 
   useEffect(() => {
     getFeedFromLocalStorage();
@@ -128,6 +131,24 @@ const Home = () => {
         contentOffset={{ y: -60, x: 0 }}
       />
       <FeedHeader />
+      <Modal
+        visible={showVibe}
+        onRequestClose={() => setShowVibe(false)}
+        transparent={true}
+        animationType="fade"
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="w-[90%] h-[75%] bg-white rounded-xl overflow-hidden">
+            <TouchableOpacity 
+              onPress={() => setShowVibe(false)}
+              className="absolute right-4 top-4 z-10"
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+            <VibeScreen colorGradient={colorGradient} setColorGradient={setColorGradient} />
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };

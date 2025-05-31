@@ -69,7 +69,7 @@ const SearchForm = ({
                             paddingVertical: 8,
                             textAlignVertical: 'center'
                         }}
-                        placeholder="Search tribes..."
+                        placeholder="Search the community..."
                         placeholderTextColor="#999"
                         value={query}
                         onChangeText={(text) => setQuery(text)}

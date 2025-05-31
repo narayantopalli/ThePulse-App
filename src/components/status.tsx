@@ -10,7 +10,7 @@ import { useSession } from "@/contexts/SessionContext";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { formatTimeAgo } from '@/hooks/formatTimeAgo';
 import { useRouter } from 'expo-router';
-import ReportButton from './ReportButton';
+import ReportButton from './buttons/ReportButton';
 
 const Status = ({ user_id }: StatusProps) => {
     const [status, setStatus] = useState<any>();
@@ -165,7 +165,7 @@ const Status = ({ user_id }: StatusProps) => {
                     )}
                   </View>
               </View>
-              <View className="flex-row items-center mb-4 mx-8 border-2 border-black rounded-2xl">
+              <View className="flex-row items-center mb-2 mx-8 border-2 border-black rounded-2xl">
                 <Image
                   source={{ uri: status.image_url }}
                   className="w-full rounded-xl"
@@ -175,29 +175,26 @@ const Status = ({ user_id }: StatusProps) => {
               </View>
               <View className="flex-row items-center justify-between mb-2">
                 {isOwnProfile ? (
-                  <View className="flex-row items-center">
-                    <FontAwesome6 name="heart" size={20} color="#ef4444" solid />
+                  <View className="flex-row items-center ml-2">
+                    <FontAwesome6 name="heart" size={28} color="#ef4444" solid />
                     <Text className="ml-2 text-gray-600 font-JakartaMedium">
                       {likes} {likes === 1 ? 'like' : 'likes'}
                     </Text>
                   </View>
                 ) : (
                   <>
+                    <ReportButton id={status.id} type="status" />
                     <TouchableOpacity 
                       onPress={handleLike}
-                      className="flex-row items-center"
+                      className="flex-row items-center mr-2"
                     >
                       <FontAwesome6 
                         name="heart" 
-                        size={20} 
+                        size={28} 
                         color={liked ? "#ef4444" : "#6b7280"}
                         solid={liked}
                       />
-                      <Text className="ml-2 text-gray-600 font-JakartaMedium">
-                        {likes} {likes === 1 ? 'like' : 'likes'}
-                      </Text>
                     </TouchableOpacity>
-                    <ReportButton id={status.id} type="status" />
                   </>
                 )}
               </View>

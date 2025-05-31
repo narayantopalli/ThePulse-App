@@ -11,7 +11,7 @@ const MyPosts = () => {
       <View className="flex flex-row justify-between items-center bg-white px-4 h-14 shadow-sm">
         <BackButton onPress={() => router.back()} />
         <Text className="text-xl font-JakartaBold flex-1 text-center">My Posts</Text>
-        <View className="border-2 border-black rounded-full overflow-hidden">
+        <View className="rounded-full overflow-hidden">
           <SmallProfilePhoto />
         </View>
       </View>

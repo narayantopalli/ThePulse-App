@@ -61,7 +61,7 @@ const TitleView = memo(({ title, isDarkMode = false }: { title?: string; isDarkM
     <View className="flex-1">
       {title ? (
         <Text className="text-black text-xl font-JakartaMedium" numberOfLines={1}>
-          {title === "Groups" ? "Tribes" : title}
+          {title === "Groups" ? "Community" : title}
         </Text>
       ) : (
         <Text className="text-[#FF6B6B] text-2xl font-JakartaExtraBold tracking-wide" numberOfLines={1}>
